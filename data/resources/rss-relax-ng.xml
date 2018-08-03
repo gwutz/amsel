@@ -1,0 +1,100 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+    <element name="rss">
+      <oneOrMore>
+        <element name="channel">
+          <ref name="channelElements"/>
+        </element>
+      </oneOrMore>
+    </element>
+  </start>
+
+  <define name="channelElements">
+    <element name="title">
+      <text />
+    </element>
+    <element name="link">
+      <text />
+    </element>
+    <element name="description">
+      <text />
+    </element>
+    <optional>
+      <element name="pubDate">
+        <text />
+      </element>
+    </optional>
+    <optional>
+      <ref name="category"/>
+    </optional>
+    <zeroOrMore>
+      <ref name="items" />
+    </zeroOrMore>
+  </define>
+
+  <define name="items">
+    <element name="item">
+      <interleave>
+        <optional>
+          <element name="title">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="link">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="description">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="author">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="pubDate">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="language">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <element name="copyright">
+            <text />
+          </element>
+        </optional>
+        <optional>
+          <ref name="category"/>
+        </optional>
+        <optional>
+          <element name="guid">
+            <optional>
+              <attribute name="isPermaLink">
+                <choice>
+                  <value>true</value>
+                  <value>false</value>
+                </choice>
+              </attribute>
+            </optional>
+            <text />
+          </element>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+
+  <define name="category">
+    <element name="category">
+      <attribute name="domain"><text/></attribute>
+      <text/>
+    </element>
+  </define>
+
+</grammar>

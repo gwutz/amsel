@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<rss>
+  <channel>
+    <title>Hello world</title>
+    <link>http://planet.gnome.org</link>
+    <description>This is a description</description>
+    <category domain="http://test">/News</category>
+    <item>
+      <guid isPermaLink="true">unique identifier</guid>
+      <title>This is a title</title>
+      <link>http://thisisaurl.com</link>
+      <category domain="http://test">/News</category>
+    </item>
+  </channel>
+</rss>

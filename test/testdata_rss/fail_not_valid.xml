@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<rss>
+  <channel>
+    <fail>
+      "Hello World"
+    </fail>
+  </channel>
+</rss>
