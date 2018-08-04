@@ -8,12 +8,11 @@ struct _AmselRequest {
 };
 
 AmselRequest *
-amsel_request_new (AmselRequestType  type,
-                   char             *data,
+amsel_request_new (char             *data,
                    gsize             size)
 {
   AmselRequest *request = malloc (sizeof (AmselRequest));
-  request->type = type;
+  request->type = AMSEL_REQUEST_TYPE_UNDECIDED;
   request->data = g_strdup (data);
   request->size = size;
   return request;
@@ -42,4 +41,11 @@ AmselRequestType
 amsel_request_get_type (AmselRequest *self)
 {
   return self->type;
+}
+
+void
+amsel_request_set_type (AmselRequest     *self,
+                        AmselRequestType  type)
+{
+  self->type = type;
 }

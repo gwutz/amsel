@@ -5,6 +5,7 @@ tests = [
 
 test_deps = [
   dependency('glib-2.0'),
+  dependency('libxml-2.0'),
 ]
 
 foreach t : tests

@@ -1,12 +1,14 @@
 #include "amsel-engine.h"
 #include "amsel-validator.h"
-#include "amsel-validator-xml.h"
+#include "amsel-validator-rss.h"
+#include "amsel-validator-atom.h"
 #include "amsel-parser.h"
 #include "amsel-parser-rss.h"
 
 struct _AmselEngine
 {
   GObject parent_instance;
+  GList *validators;
 };
 
 G_DEFINE_TYPE (AmselEngine, amsel_engine, G_TYPE_OBJECT)
@@ -28,6 +30,8 @@ static void
 amsel_engine_finalize (GObject *object)
 {
   AmselEngine *self = (AmselEngine *)object;
+
+  g_list_free_full (self->validators, g_object_unref);
 
   G_OBJECT_CLASS (amsel_engine_parent_class)->finalize (object);
 }
@@ -75,6 +79,8 @@ amsel_engine_class_init (AmselEngineClass *klass)
 static void
 amsel_engine_init (AmselEngine *self)
 {
+  self->validators = g_list_append (self->validators, amsel_validator_rss_new ());
+  self->validators = g_list_append (self->validators, amsel_validator_atom_new ());
 }
 
 gboolean
@@ -85,18 +91,25 @@ amsel_engine_validate (AmselEngine  *self,
   g_return_val_if_fail (request != NULL, FALSE);
   g_return_val_if_fail (amsel_request_get_data (request) != NULL, FALSE);
 
-  g_autoptr (AmselValidator) validator;
+  gboolean valid = FALSE;
 
-  switch (amsel_request_get_type (request)) {
-  case AMSEL_REQUEST_TYPE_XML:
-    validator = AMSEL_VALIDATOR (amsel_validator_xml_new ());
-    return amsel_validator_validate (validator, amsel_request_get_data (request));
-    break;
-  case AMSEL_REQUEST_TYPE_JSON:
-    validator = AMSEL_VALIDATOR (amsel_validator_xml_new ());
-    return amsel_validator_validate (validator, amsel_request_get_data (request));
-    break;
-  }
+  for (GList *cur = self->validators; cur; cur = g_list_next (cur))
+    {
+      AmselValidator *validator = AMSEL_VALIDATOR (cur->data);
+      valid = amsel_validator_validate (validator, amsel_request_get_data (request));
+
+      if (valid) {
+        if (AMSEL_IS_VALIDATOR_RSS (validator)) {
+          amsel_request_set_type (request, AMSEL_REQUEST_TYPE_RSS);
+        } else if (AMSEL_IS_VALIDATOR_ATOM (validator)) {
+          amsel_request_set_type (request, AMSEL_REQUEST_TYPE_ATOM);
+        }
+        break;
+      }
+
+    }
+
+  return valid;
 }
 
 GPtrArray *
@@ -110,10 +123,10 @@ amsel_engine_parse (AmselEngine  *self,
   AmselParserRss *parser = amsel_parser_rss_new ();
 
   switch (amsel_request_get_type (request)) {
-  case AMSEL_REQUEST_TYPE_XML:
+  case AMSEL_REQUEST_TYPE_RSS:
     return amsel_parser_parse (AMSEL_PARSER (parser), request);
     break;
-  case AMSEL_REQUEST_TYPE_JSON:
+  case AMSEL_REQUEST_TYPE_ATOM:
     break;
   }
 

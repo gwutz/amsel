@@ -10,8 +10,6 @@ typedef void (*process_node) (AmselParser *parser,
 struct _AmselParserRss
 {
   GObject parent_instance;
-
-  GHashTable *mapping;
 };
 
 static void amsel_parser_iface_init (AmselParserInterface *iface);
@@ -82,18 +80,8 @@ amsel_parser_rss_class_init (AmselParserRssClass *klass)
 }
 
 static void
-amsel_process_rss (AmselParser *parser,
-                   xmlNodePtr  *node)
-{
-  g_print ("Hello rss\n");
-}
-
-static void
 amsel_parser_rss_init (AmselParserRss *self)
 {
-  self->mapping = g_hash_table_new (g_str_hash, g_str_equal);
-
-  g_hash_table_insert (self->mapping, "rss", amsel_process_rss);
 }
 
 #define HANDLE_CHANNEL_NODE(namestr, parsefunc) \
@@ -122,7 +110,21 @@ amsel_parser_rss_parse_item (AmselParser *parser,
           g_autoptr (GDateTime) pubDate = amsel_date_parser_parse_RFC822 (rfc822);
           amsel_entry_set_updated_datetime (item, pubDate);
         }
+      else if HANDLE_ITEM_NODE(author, amsel_entry_set_author)
 
+      cur = cur->next;
+    }
+}
+
+static void
+amsel_parser_rss_parse_image (AmselParser  *parser,
+                              AmselChannel *channel,
+                              xmlDocPtr     doc,
+                              xmlNodePtr    cur)
+{
+  while (cur)
+    {
+      if HANDLE_CHANNEL_NODE (url, amsel_channel_set_icon)
       cur = cur->next;
     }
 }
@@ -145,6 +147,10 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
           amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
           amsel_channel_add_entry (channel, item);
         }
+      if (!xmlStrcmp (cur->name, BAD_CAST "image"))
+        {
+          amsel_parser_rss_parse_image (parser, channel, doc, cur->xmlChildrenNode);
+        }
 
       cur = cur->next;
     }
@@ -156,9 +162,6 @@ amsel_parser_rss_internal_parse (AmselParser *parser,
                                  xmlDocPtr    doc,
                                  xmlNodePtr   node)
 {
-  char *name = (char *)node->name;
-  g_print ("Node: %s\n", name);
-
   xmlNodePtr cur = node;
 
   if (cur && !xmlStrcmp (cur->name, BAD_CAST "rss")) {

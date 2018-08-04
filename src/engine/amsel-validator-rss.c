@@ -1,48 +1,48 @@
-#include "amsel-validator-xml.h"
+#include "amsel-validator-rss.h"
 #include "amsel-validator.h"
 #include <libxml/relaxng.h>
 #include <gio/gio.h>
 
-struct _AmselValidatorXml
+struct _AmselValidatorRss
 {
   GObject parent_instance;
   xmlRelaxNGValidCtxtPtr validctxt;
   xmlRelaxNGPtr schema;
 };
 
-static void amsel_validator_xml_iface_init (AmselValidatorInterface *iface);
+static void amsel_validator_rss_iface_init (AmselValidatorInterface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (AmselValidatorXml, amsel_validator_xml, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (AmselValidatorRss, amsel_validator_rss, G_TYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (AMSEL_TYPE_VALIDATOR,
-                                                amsel_validator_xml_iface_init))
+                                                amsel_validator_rss_iface_init))
 
-AmselValidatorXml *
-amsel_validator_xml_new (void)
+AmselValidatorRss *
+amsel_validator_rss_new (void)
 {
-  return g_object_new (AMSEL_TYPE_VALIDATOR_XML, NULL);
+  return g_object_new (AMSEL_TYPE_VALIDATOR_RSS, NULL);
 }
 
 static void
-amsel_validator_xml_finalize (GObject *object)
+amsel_validator_rss_finalize (GObject *object)
 {
-  AmselValidatorXml *self = (AmselValidatorXml *)object;
+  AmselValidatorRss *self = (AmselValidatorRss *)object;
 
   xmlRelaxNGFreeValidCtxt (self->validctxt);
   xmlRelaxNGFree (self->schema);
 
-  G_OBJECT_CLASS (amsel_validator_xml_parent_class)->finalize (object);
+  G_OBJECT_CLASS (amsel_validator_rss_parent_class)->finalize (object);
 }
 
 static void
-amsel_validator_xml_class_init (AmselValidatorXmlClass *klass)
+amsel_validator_rss_class_init (AmselValidatorRssClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = amsel_validator_xml_finalize;
+  object_class->finalize = amsel_validator_rss_finalize;
 }
 
 static void
-amsel_validator_xml_init (AmselValidatorXml *self)
+amsel_validator_rss_init (AmselValidatorRss *self)
 {
   GError *error = NULL;
   GBytes *rngbytes;
@@ -70,13 +70,16 @@ amsel_validator_xml_init (AmselValidatorXml *self)
 }
 
 gboolean
-amsel_validator_xml_validate (AmselValidator *validator,
+amsel_validator_rss_validate (AmselValidator *validator,
                               char           *data)
 {
+  g_return_val_if_fail (AMSEL_IS_VALIDATOR_RSS (validator), FALSE);
+  g_return_val_if_fail (data != NULL, FALSE);
+
   xmlDocPtr xmldoc;
   int result;
 
-  AmselValidatorXml *self = AMSEL_VALIDATOR_XML (validator);
+  AmselValidatorRss *self = AMSEL_VALIDATOR_RSS (validator);
 
   xmldoc = xmlParseMemory (data, strlen (data));
 
@@ -88,7 +91,7 @@ amsel_validator_xml_validate (AmselValidator *validator,
 }
 
 static void
-amsel_validator_xml_iface_init (AmselValidatorInterface *iface)
+amsel_validator_rss_iface_init (AmselValidatorInterface *iface)
 {
-  iface->validate = amsel_validator_xml_validate;
+  iface->validate = amsel_validator_rss_validate;
 }

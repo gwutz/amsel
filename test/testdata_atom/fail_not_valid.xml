@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>http://example.com/atom.xml</id>
+  <!-- <title>Title</title> -->
+  <updated>2018-08-04T10:11:12Z</updated>
+  <entry>
+    <id>Post 1 Id</id>
+    <title>Post 1 Title</title>
+    <updated>2018-08-04T10:11:13Z</updated>
+    <link href="http://example.com/post1" rel="relation"/>
+    <content type="text">Post 1 Content</content>
+    <author>
+      <name>Günther Wagner</name>
+    </author>
+  </entry>
+</feed>

@@ -28,34 +28,33 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (AmselEntry, amsel_entry, AMSEL, ENTRY, GObject)
 
-AmselEntry     *amsel_entry_new           (void);
-void            amsel_entry_set_id        (AmselEntry  *self,
-                                           const gchar *id);
-const gchar    *amsel_entry_get_id        (AmselEntry *self);
-void            amsel_entry_set_title     (AmselEntry  *self,
-                                           const gchar *title);
-const gchar    *amsel_entry_get_title     (AmselEntry *self);
-void            amsel_entry_set_content   (AmselEntry  *self,
-                                           const gchar *content);
-const gchar    *amsel_entry_get_content   (AmselEntry *self);
-void            amsel_entry_set_updated   (AmselEntry  *self,
-                                           const gchar *updated);
-void            amsel_entry_set_updated_datetime   (AmselEntry *self,
-                                                    GDateTime  *updated);
-GDateTime      *amsel_entry_get_updated   (AmselEntry *self);
-void            amsel_entry_set_link      (AmselEntry  *self,
-                                           const gchar *link);
-const gchar    *amsel_entry_get_link      (AmselEntry *self);
-void            amsel_entry_set_author    (AmselEntry  *self,
-                                           const gchar *author);
-const gchar    *amsel_entry_get_author    (AmselEntry *self);
+AmselEntry  *amsel_entry_new                  (void);
+void         amsel_entry_set_id               (AmselEntry  *self,
+                                               const gchar *id);
+const gchar *amsel_entry_get_id               (AmselEntry  *self);
+void         amsel_entry_set_title            (AmselEntry  *self,
+                                               const gchar *title);
+const gchar *amsel_entry_get_title            (AmselEntry  *self);
+void         amsel_entry_set_content          (AmselEntry  *self,
+                                               const gchar *content);
+const gchar *amsel_entry_get_content          (AmselEntry  *self);
+void         amsel_entry_set_updated          (AmselEntry  *self,
+                                               const gchar *updated);
+void         amsel_entry_set_updated_datetime (AmselEntry  *self,
+                                               GDateTime   *updated);
+GDateTime   *amsel_entry_get_updated          (AmselEntry  *self);
+void         amsel_entry_set_link             (AmselEntry  *self,
+                                               const gchar *link);
+const gchar *amsel_entry_get_link             (AmselEntry  *self);
+void         amsel_entry_set_author           (AmselEntry  *self,
+                                               const gchar *author);
+const gchar *amsel_entry_get_author           (AmselEntry  *self);
 
-// display
-void            amsel_entry_set_preview_image (AmselEntry  *self,
+void         amsel_entry_set_preview_image    (AmselEntry  *self,
                                                const gchar *preview_image);
-const gchar    *amsel_entry_get_preview_image (AmselEntry  *self);
-void            amsel_entry_set_read          (AmselEntry *self,
-                                               gboolean    read);
-gboolean        amsel_entry_get_read          (AmselEntry *self);
+const gchar *amsel_entry_get_preview_image    (AmselEntry  *self);
+void         amsel_entry_set_read             (AmselEntry  *self,
+                                               gboolean     read);
+gboolean     amsel_entry_get_read             (AmselEntry  *self);
 
 G_END_DECLS
