@@ -120,7 +120,7 @@ amsel_engine_parse (AmselEngine  *self,
   g_return_val_if_fail (request != NULL, NULL);
   g_return_val_if_fail (amsel_request_get_data (request) != NULL, NULL);
 
-  AmselParserRss *parser = amsel_parser_rss_new ();
+  g_autoptr (AmselParserRss) parser = amsel_parser_rss_new ();
 
   switch (amsel_request_get_type (request)) {
   case AMSEL_REQUEST_TYPE_RSS:

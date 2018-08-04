@@ -86,12 +86,16 @@ amsel_parser_rss_init (AmselParserRss *self)
 
 #define HANDLE_CHANNEL_NODE(namestr, parsefunc) \
     (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      parsefunc (channel, (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1)); \
+      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
+      parsefunc (channel, str); \
+      xmlFree (str);\
     }
 
 #define HANDLE_ITEM_NODE(namestr, parsefunc) \
     (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      parsefunc (item, (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1)); \
+      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
+      parsefunc (item, str); \
+      xmlFree (str);\
     }
 
 static void
@@ -109,6 +113,7 @@ amsel_parser_rss_parse_item (AmselParser *parser,
           char *rfc822 = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
           g_autoptr (GDateTime) pubDate = amsel_date_parser_parse_RFC822 (rfc822);
           amsel_entry_set_updated_datetime (item, pubDate);
+          xmlFree (rfc822);
         }
       else if HANDLE_ITEM_NODE(author, amsel_entry_set_author)
 
@@ -188,12 +193,13 @@ amsel_parser_rss_parse (AmselParser  *parser,
   xmlDocPtr doc;
   GPtrArray *channels;
 
-  channels = g_ptr_array_new ();
+  channels = g_ptr_array_new_with_free_func (g_object_unref);
 
   doc = xmlParseMemory (amsel_request_get_data (request), amsel_request_get_size (request));
 
   xmlNodePtr root = xmlDocGetRootElement (doc);
   amsel_parser_rss_internal_parse (parser, channels, doc, root);
+  xmlFreeDoc (doc);
   return channels;
 }
 

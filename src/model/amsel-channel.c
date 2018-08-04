@@ -50,6 +50,8 @@ amsel_channel_finalize (GObject *object)
   g_clear_pointer (&self->source, g_free);
   g_clear_pointer (&self->icon, g_free);
 
+  g_list_free_full (self->entries, g_object_unref);
+
   G_OBJECT_CLASS (amsel_channel_parent_class)->finalize (object);
 }
 

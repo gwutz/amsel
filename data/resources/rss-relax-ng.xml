@@ -11,26 +11,31 @@
   </start>
 
   <define name="channelElements">
-    <element name="title">
-      <text />
-    </element>
-    <element name="link">
-      <text />
-    </element>
-    <element name="description">
-      <text />
-    </element>
-    <optional>
-      <element name="pubDate">
+    <interleave>
+      <element name="title">
         <text />
       </element>
-    </optional>
-    <optional>
-      <ref name="category"/>
-    </optional>
-    <zeroOrMore>
-      <ref name="items" />
-    </zeroOrMore>
+      <element name="link">
+        <text />
+      </element>
+      <element name="description">
+        <text />
+      </element>
+      <optional>
+        <element name="pubDate">
+          <text />
+        </element>
+      </optional>
+      <optional>
+        <ref name="category"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="items"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="image"/>
+      </optional>
+    </interleave>
   </define>
 
   <define name="items">
@@ -95,6 +100,14 @@
     <element name="category">
       <attribute name="domain"><text/></attribute>
       <text/>
+    </element>
+  </define>
+
+  <define name="image">
+    <element name="image">
+      <element name="url">
+        <text/>
+      </element>
     </element>
   </define>
 

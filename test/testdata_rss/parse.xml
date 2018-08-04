@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<rss>
+ <channel>
+   <title>Planet Gnome</title>
+   <description>This is Planet Gnome</description>
+   <link>http://planet.gnome.org</link>
+   <item>
+     <title>Post 1</title>
+     <description>Post 1 Description</description>
+     <pubDate>Mon, 01 Jan 2018 21:19:18</pubDate>
+     <author>Günther Wagner</author>
+   </item>
+   <image>
+     <url>http://planet.gnome.org/icon.png</url>
+   </image>
+ </channel>
+</rss>

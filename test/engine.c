@@ -75,32 +75,23 @@ test_validate_atom (void)
 void
 test_parse_xml (void)
 {
+  GError *error = NULL;
   g_autoptr (AmselEngine) engine;
   AmselRequest *request;
   GPtrArray *channels;
-  char *xml =
-    "<rss>"
-    " <channel>"
-    "   <title>Planet Gnome</title>"
-    "   <description>This is Planet Gnome</description>"
-    "   <link>http://planet.gnome.org</link>"
-    "   <item>"
-    "     <title>Post 1</title>"
-    "     <description>Post 1 Description</description>"
-    "     <pubDate>Mon, 01 Jan 2018 21:19:18</pubDate>"
-    "     <author>Günther Wagner</author>"
-    "   </item>"
-    "   <image>"
-    "     <url>http://planet.gnome.org/icon.png</url>"
-    "   </image>"
-    " </channel>"
-    "</rss>";
+  char *xml;
+  gsize length;
+
+  g_file_get_contents (SRCDIR"/test/testdata_rss/parse.xml", &xml, &length, &error);
 
   request = amsel_request_new (xml, strlen (xml));
+  g_free (xml);
   amsel_request_set_type (request, AMSEL_REQUEST_TYPE_RSS);
 
   engine = amsel_engine_new ();
   channels = amsel_engine_parse (engine, request);
+
+  amsel_request_free (request);
 
   g_assert_nonnull (channels);
   g_assert_cmpint (1, ==, channels->len);
@@ -127,12 +118,12 @@ test_parse_xml (void)
           g_assert_cmpstr (amsel_entry_get_author (item), ==, "Günther Wagner");
         }
     }
+  g_ptr_array_unref (channels);
 }
 
 void
 test_parse_atom (void)
 {
-
 }
 
 void
