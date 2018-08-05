@@ -12,7 +12,7 @@ struct _AmselChannel
   char *source;
   char *icon;
 
-  GList *entries;
+  GHashTable *entries;
 };
 
 G_DEFINE_TYPE (AmselChannel, amsel_channel, G_TYPE_OBJECT)
@@ -50,7 +50,7 @@ amsel_channel_finalize (GObject *object)
   g_clear_pointer (&self->source, g_free);
   g_clear_pointer (&self->icon, g_free);
 
-  g_list_free_full (self->entries, g_object_unref);
+  g_hash_table_unref (self->entries);
 
   G_OBJECT_CLASS (amsel_channel_parent_class)->finalize (object);
 }
@@ -185,6 +185,7 @@ amsel_channel_class_init (AmselChannelClass *klass)
 static void
 amsel_channel_init (AmselChannel *self)
 {
+  self->entries = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_object_unref);
 }
 
 void
@@ -313,7 +314,7 @@ amsel_channel_add_entry (AmselChannel *self,
 {
   g_return_if_fail (AMSEL_IS_CHANNEL (self));
 
-  self->entries = g_list_append (self->entries, entry);
+  g_hash_table_insert (self->entries, (char *)amsel_entry_get_id (entry), entry);
 }
 
 /**
@@ -324,7 +325,7 @@ amsel_channel_add_entry (AmselChannel *self,
  *
  * Returns: (transfer none) (element-type AmselEntry): the #AmselEntry objects
  */
-const GList *
+GHashTable *
 amsel_channel_get_entries (AmselChannel *self)
 {
   g_return_val_if_fail (AMSEL_IS_CHANNEL (self), NULL);

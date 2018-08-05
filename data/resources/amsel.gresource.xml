@@ -3,5 +3,6 @@
   <gresource prefix="/org/gnome/Amsel">
   <file>rss-relax-ng.xml</file>
   <file>atom-relax-ng.xml</file>
+  <file>rss-schema.xsd</file>
   </gresource>
 </gresources>

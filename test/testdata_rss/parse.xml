@@ -5,6 +5,7 @@
    <description>This is Planet Gnome</description>
    <link>http://planet.gnome.org</link>
    <item>
+     <guid>unique identifier</guid>
      <title>Post 1</title>
      <description>Post 1 Description</description>
      <pubDate>Mon, 01 Jan 2018 21:19:18</pubDate>

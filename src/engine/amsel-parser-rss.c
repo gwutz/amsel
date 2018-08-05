@@ -18,12 +18,12 @@ G_DEFINE_TYPE_WITH_CODE (AmselParserRss, amsel_parser_rss, G_TYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (AMSEL_TYPE_PARSER,
                                                 amsel_parser_iface_init))
 
-enum {
-  PROP_0,
-  N_PROPS
-};
+/* enum { */
+/*   PROP_0, */
+/*   N_PROPS */
+/* }; */
 
-static GParamSpec *properties [N_PROPS];
+/* static GParamSpec *properties [N_PROPS]; */
 
 AmselParserRss *
 amsel_parser_rss_new (void)
@@ -34,40 +34,40 @@ amsel_parser_rss_new (void)
 static void
 amsel_parser_rss_finalize (GObject *object)
 {
-  AmselParserRss *self = (AmselParserRss *)object;
+  /* AmselParserRss *self = (AmselParserRss *)object; */
 
   G_OBJECT_CLASS (amsel_parser_rss_parent_class)->finalize (object);
 }
 
-static void
-amsel_parser_rss_get_property (GObject    *object,
-                               guint       prop_id,
-                               GValue     *value,
-                               GParamSpec *pspec)
-{
-  AmselParserRss *self = AMSEL_PARSER_RSS (object);
+/* static void */
+/* amsel_parser_rss_get_property (GObject    *object, */
+/*                                guint       prop_id, */
+/*                                GValue     *value, */
+/*                                GParamSpec *pspec) */
+/* { */
+/*   AmselParserRss *self = AMSEL_PARSER_RSS (object); */
 
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
+/*   switch (prop_id) */
+/*     { */
+/*     default: */
+/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
+/*     } */
+/* } */
 
-static void
-amsel_parser_rss_set_property (GObject      *object,
-                               guint         prop_id,
-                               const GValue *value,
-                               GParamSpec   *pspec)
-{
-  AmselParserRss *self = AMSEL_PARSER_RSS (object);
+/* static void */
+/* amsel_parser_rss_set_property (GObject      *object, */
+/*                                guint         prop_id, */
+/*                                const GValue *value, */
+/*                                GParamSpec   *pspec) */
+/* { */
+/*   AmselParserRss *self = AMSEL_PARSER_RSS (object); */
 
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
+/*   switch (prop_id) */
+/*     { */
+/*     default: */
+/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
+/*     } */
+/* } */
 
 static void
 amsel_parser_rss_class_init (AmselParserRssClass *klass)
@@ -75,8 +75,8 @@ amsel_parser_rss_class_init (AmselParserRssClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = amsel_parser_rss_finalize;
-  object_class->get_property = amsel_parser_rss_get_property;
-  object_class->set_property = amsel_parser_rss_set_property;
+  /* object_class->get_property = amsel_parser_rss_get_property; */
+  /* object_class->set_property = amsel_parser_rss_set_property; */
 }
 
 static void
@@ -108,6 +108,7 @@ amsel_parser_rss_parse_item (AmselParser *parser,
     {
       if HANDLE_ITEM_NODE(title, amsel_entry_set_title)
       else if HANDLE_ITEM_NODE(description, amsel_entry_set_content)
+      else if HANDLE_ITEM_NODE(guid, amsel_entry_set_id)
       else if (!xmlStrcmp (cur->name, BAD_CAST "pubDate"))
         {
           char *rfc822 = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
@@ -142,17 +143,26 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
 {
   while (cur)
     {
+      if (cur->type != XML_ELEMENT_NODE || cur->name == NULL) {
+        cur = cur->next;
+        continue;
+      }
+
+      if (cur->ns) {
+        cur = cur->next;
+        continue;
+      }
+
       if HANDLE_CHANNEL_NODE(title, amsel_channel_set_title)
       else if HANDLE_CHANNEL_NODE(description, amsel_channel_set_description)
       else if HANDLE_CHANNEL_NODE(link, amsel_channel_set_source)
-
-      if (!xmlStrcmp (cur->name, BAD_CAST "item"))
+      else if (!xmlStrcmp (cur->name, BAD_CAST "item"))
         {
           AmselEntry *item = amsel_entry_new ();
           amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
           amsel_channel_add_entry (channel, item);
         }
-      if (!xmlStrcmp (cur->name, BAD_CAST "image"))
+      else if (!xmlStrcmp (cur->name, BAD_CAST "image"))
         {
           amsel_parser_rss_parse_image (parser, channel, doc, cur->xmlChildrenNode);
         }

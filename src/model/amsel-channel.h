@@ -28,5 +28,5 @@ void          amsel_channel_set_icon        (AmselChannel *self,
 const gchar  *amsel_channel_get_icon        (AmselChannel *self);
 void          amsel_channel_add_entry       (AmselChannel *self,
                                              AmselEntry   *entry);
-const GList  *amsel_channel_get_entries     (AmselChannel *self);
+GHashTable   *amsel_channel_get_entries     (AmselChannel *self);
 G_END_DECLS

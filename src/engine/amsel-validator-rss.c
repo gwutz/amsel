@@ -1,13 +1,15 @@
 #include "amsel-validator-rss.h"
 #include "amsel-validator.h"
-#include <libxml/relaxng.h>
+#include <libxml/xmlschemas.h>
 #include <gio/gio.h>
+
+#include "data/resources/amsel-resources.h"
 
 struct _AmselValidatorRss
 {
   GObject parent_instance;
-  xmlRelaxNGValidCtxtPtr validctxt;
-  xmlRelaxNGPtr schema;
+  xmlSchemaValidCtxtPtr validctxt;
+  xmlSchemaPtr schema;
 };
 
 static void amsel_validator_rss_iface_init (AmselValidatorInterface *iface);
@@ -27,8 +29,8 @@ amsel_validator_rss_finalize (GObject *object)
 {
   AmselValidatorRss *self = (AmselValidatorRss *)object;
 
-  xmlRelaxNGFreeValidCtxt (self->validctxt);
-  xmlRelaxNGFree (self->schema);
+  xmlSchemaFreeValidCtxt (self->validctxt);
+  xmlSchemaFree (self->schema);
 
   G_OBJECT_CLASS (amsel_validator_rss_parent_class)->finalize (object);
 }
@@ -45,28 +47,28 @@ static void
 amsel_validator_rss_init (AmselValidatorRss *self)
 {
   GError *error = NULL;
-  GBytes *rngbytes;
-  xmlRelaxNGParserCtxtPtr context;
-  char *xml_rng;
+  GBytes *xsdbytes;
+  xmlSchemaParserCtxtPtr context;
+  char *xml_xsd;
   gsize size;
 
   g_resources_register (amsel_get_resource ());
 
-  rngbytes = g_resources_lookup_data ("/org/gnome/Amsel/rss-relax-ng.xml",
+  xsdbytes = g_resources_lookup_data ("/org/gnome/Amsel/rss-schema.xsd",
                                        G_RESOURCE_LOOKUP_FLAGS_NONE,
                                        &error);
   if (error != NULL) {
     g_error ("%s", error->message);
   }
 
-  xml_rng = g_bytes_unref_to_data (rngbytes, &size);
+  xml_xsd = g_bytes_unref_to_data (xsdbytes, &size);
 
-  context = xmlRelaxNGNewMemParserCtxt (xml_rng, size);
-  self->schema = xmlRelaxNGParse (context);
-  self->validctxt = xmlRelaxNGNewValidCtxt (self->schema);
+  context = xmlSchemaNewMemParserCtxt (xml_xsd, size);
+  self->schema = xmlSchemaParse (context);
+  self->validctxt = xmlSchemaNewValidCtxt (self->schema);
 
-  g_free (xml_rng);
-  xmlRelaxNGFreeParserCtxt (context);
+  g_free (xml_xsd);
+  xmlSchemaFreeParserCtxt (context);
 }
 
 gboolean
@@ -83,7 +85,7 @@ amsel_validator_rss_validate (AmselValidator *validator,
 
   xmldoc = xmlParseMemory (data, strlen (data));
 
-  result = xmlRelaxNGValidateDoc (self->validctxt, xmldoc);
+  result = xmlSchemaValidateDoc (self->validctxt, xmldoc);
 
   xmlFreeDoc (xmldoc);
 

@@ -23,6 +23,7 @@ test_validate_rss (void)
 
       g_autofree char *file = g_build_filename (SRCDIR, "/test/testdata_rss/", name, NULL);
       g_file_get_contents (file, &xml, &length, &error);
+      g_debug ("Process testfile: %s", file);
       AmselRequest *data = amsel_request_new (xml, length);
       g_free (xml);
 
@@ -73,7 +74,7 @@ test_validate_atom (void)
 }
 
 void
-test_parse_xml (void)
+test_parse_rss (void)
 {
   GError *error = NULL;
   g_autoptr (AmselEngine) engine;
@@ -86,7 +87,6 @@ test_parse_xml (void)
 
   request = amsel_request_new (xml, strlen (xml));
   g_free (xml);
-  amsel_request_set_type (request, AMSEL_REQUEST_TYPE_RSS);
 
   engine = amsel_engine_new ();
   channels = amsel_engine_parse (engine, request);
@@ -105,10 +105,14 @@ test_parse_xml (void)
       g_assert_cmpstr (amsel_channel_get_source (c), ==, "http://planet.gnome.org");
       g_assert_cmpstr (amsel_channel_get_icon (c), ==, "http://planet.gnome.org/icon.png");
 
-      const GList *items = amsel_channel_get_entries (c);
-      for (const GList *cur = items; cur != NULL; cur = g_list_next (cur))
+      GHashTable *items = amsel_channel_get_entries (c);
+      g_assert_cmpint (g_hash_table_size (items), ==, 1);
+      GHashTableIter iter;
+      gpointer key, value;
+      g_hash_table_iter_init (&iter, items);
+      while (g_hash_table_iter_next (&iter, &key, &value))
         {
-          AmselEntry *item = cur->data;
+          AmselEntry *item = value;
           g_assert_true (AMSEL_IS_ENTRY (item));
           g_assert_cmpstr (amsel_entry_get_title (item), ==, "Post 1");
           g_assert_cmpstr (amsel_entry_get_content (item), ==, "Post 1 Description");
@@ -116,6 +120,7 @@ test_parse_xml (void)
           g_assert_nonnull (pubDate);
           g_assert (g_date_time_to_unix (pubDate) == 1514837958);
           g_assert_cmpstr (amsel_entry_get_author (item), ==, "Günther Wagner");
+          g_assert_cmpstr (amsel_entry_get_id (item), ==, "unique identifier");
         }
     }
   g_ptr_array_unref (channels);
@@ -124,6 +129,50 @@ test_parse_xml (void)
 void
 test_parse_atom (void)
 {
+  GError *error = NULL;
+  g_autoptr (AmselEngine) engine;
+  AmselRequest *request;
+  g_autoptr (GPtrArray) channels;
+  g_autofree char *xml;
+  gsize length;
+
+  g_file_get_contents (SRCDIR"/test/testdata_atom/parse.xml", &xml, &length, &error);
+
+  request = amsel_request_new (xml, strlen (xml));
+
+  engine = amsel_engine_new ();
+  channels = amsel_engine_parse (engine, request);
+
+  amsel_request_free (request);
+
+  g_assert_nonnull (channels);
+  g_assert_cmpint (1, ==, channels->len);
+  for (int i = 0; i < channels->len; i++)
+    {
+      AmselChannel *c = g_ptr_array_index (channels, i);
+      g_assert_true (AMSEL_IS_CHANNEL (c));
+
+      g_assert_cmpstr (amsel_channel_get_title (c), ==, "Planet Gnome");
+      g_assert_cmpstr (amsel_channel_get_source (c), ==, "http://planet.gnome.org");
+
+      GHashTable *items = amsel_channel_get_entries (c);
+      g_assert_cmpint (g_hash_table_size (items), ==, 1);
+      GHashTableIter iter;
+      gpointer key, value;
+      g_hash_table_iter_init (&iter, items);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          AmselEntry *item = value;
+          g_assert_true (AMSEL_IS_ENTRY (item));
+          g_assert_cmpstr (amsel_entry_get_title (item), ==, "Post 1");
+          g_assert_cmpstr (amsel_entry_get_content (item), ==, "Post 1 Content");
+          GDateTime *pubDate = amsel_entry_get_updated (item);
+          g_assert_nonnull (pubDate);
+          g_assert (g_date_time_to_unix (pubDate) == 1533377473);
+          g_assert_cmpstr (amsel_entry_get_author (item), ==, "Günther Wagner");
+          g_assert_cmpstr (amsel_entry_get_id (item), ==, "Post 1 ID");
+        }
+    }
 }
 
 void
@@ -142,9 +191,9 @@ main (int   argc,
   xmlGenericErrorFunc error_func = &(xml_error_func);
   initGenericErrorDefaultFunc (&error_func);
 
-  g_test_add_func ("/validate/rss", test_validate_rss);
-  g_test_add_func ("/validate/atom", test_validate_atom);
-  g_test_add_func ("/parser/rss", test_parse_xml);
+  /* g_test_add_func ("/validate/rss", test_validate_rss); */
+  /* g_test_add_func ("/validate/atom", test_validate_atom); */
+  g_test_add_func ("/parser/rss", test_parse_rss);
   g_test_add_func ("/parser/atom", test_parse_atom);
 
   return g_test_run ();

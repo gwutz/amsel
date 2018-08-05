@@ -10,7 +10,7 @@ typedef enum {
 
 typedef struct _AmselRequest AmselRequest;
 
-AmselRequest     *amsel_request_new      (char             *data,
+AmselRequest     *amsel_request_new      (const char       *data,
                                           gsize             size);
 void              amsel_request_set_type (AmselRequest     *self,
                                           AmselRequestType  type);

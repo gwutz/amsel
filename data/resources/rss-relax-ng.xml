@@ -2,6 +2,9 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0">
   <start>
     <element name="rss">
+      <attribute name="version">
+        <text/>
+      </attribute>
       <oneOrMore>
         <element name="channel">
           <ref name="channelElements"/>
@@ -15,9 +18,11 @@
       <element name="title">
         <text />
       </element>
-      <element name="link">
-        <text />
-      </element>
+      <oneOrMore>
+        <element name="link">
+          <text />
+        </element>
+      </oneOrMore>
       <element name="description">
         <text />
       </element>
@@ -29,6 +34,17 @@
       <optional>
         <ref name="category"/>
       </optional>
+      <optional>
+        <element name="generator">
+          <text/>
+        </element>
+      </optional>
+      <!-- <optional> -->
+        <!-- <element name="lastBuildDate"> -->
+        <!--   <text/> -->
+        <!-- </element> -->
+      <!--   <zeroOrMore> -->
+      <!-- </optional> -->
       <zeroOrMore>
         <ref name="items"/>
       </zeroOrMore>
@@ -108,6 +124,31 @@
       <element name="url">
         <text/>
       </element>
+      <optional>
+        <element name="title">
+          <text/>
+        </element>
+      </optional>
+      <optional>
+        <element name="link">
+          <text/>
+        </element>
+      </optional>
+    </element>
+  </define>
+
+  <define name="anyElement">
+    <element>
+      <anyName/>
+      <zeroOrMore>
+	<choice>
+	  <attribute>
+	    <anyName/>
+	  </attribute>
+	  <text/>
+	  <ref name="anyElement"/>
+	</choice>
+      </zeroOrMore>
     </element>
   </define>
 

@@ -1,11 +1,14 @@
 tests = [
   'engine',
   'utils',
+  'stresstest',
+  'cache',
 ]
 
 test_deps = [
   dependency('glib-2.0'),
   dependency('libxml-2.0'),
+  dependency('libsoup-2.4'),
 ]
 
 foreach t : tests

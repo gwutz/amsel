@@ -3,6 +3,8 @@
 #include <libxml/relaxng.h>
 #include <gio/gio.h>
 
+#include "data/resources/amsel-resources.h"
+
 struct _AmselValidatorAtom
 {
   GObject parent_instance;

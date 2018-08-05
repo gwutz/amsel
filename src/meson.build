@@ -15,6 +15,7 @@ amsel_sources = [
   'engine/amsel-parser.c',
   'engine/amsel-parser-rss.c',
   'engine/amsel-parser-atom.c',
+  'engine/amsel-cache.c',
   'model/amsel-channel.c',
   'model/amsel-entry.c',
   'utils/amsel-date-parser.c',

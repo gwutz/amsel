@@ -7,15 +7,42 @@ struct _AmselRequest {
   gsize size;
 };
 
+/* internal methods */
+static AmselRequestType determine_type (const char *data,
+                                        gsize       size);
+
 AmselRequest *
-amsel_request_new (char             *data,
-                   gsize             size)
+amsel_request_new (const char *data,
+                   gsize       size)
 {
   AmselRequest *request = malloc (sizeof (AmselRequest));
-  request->type = AMSEL_REQUEST_TYPE_UNDECIDED;
+  request->type = determine_type (data, size);
   request->data = g_strdup (data);
   request->size = size;
   return request;
+}
+
+static AmselRequestType
+determine_type (const char *data,
+                gsize       size)
+{
+  gboolean isxml;
+  const char *cur = data;
+
+  // skip possible whitespace
+  while (*cur == ' ')
+    cur++;
+
+  isxml = g_str_has_prefix (cur, "<?xml");
+
+  if (isxml) {
+    char *rss = strstr (cur, "<rss");
+    if (rss != NULL) return AMSEL_REQUEST_TYPE_RSS;
+    char *atom = strstr (cur, "<feed");
+    if (atom != NULL) return AMSEL_REQUEST_TYPE_ATOM;
+  }
+
+  return AMSEL_REQUEST_TYPE_UNDECIDED;
 }
 
 void
