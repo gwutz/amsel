@@ -33,6 +33,8 @@ amsel_sqlite_database_finalize (GObject *object)
 {
   AmselSqliteDatabase *self = (AmselSqliteDatabase *)object;
 
+  sqlite3_close (self->db);
+
   G_OBJECT_CLASS (amsel_sqlite_database_parent_class)->finalize (object);
 }
 

@@ -222,6 +222,7 @@ amsel_cache_get_channels (AmselCache *self)
     {
       g_ptr_array_add (ret, cur->data);
     }
+  g_list_free (channel_list);
 
   return ret;
 }

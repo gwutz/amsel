@@ -58,7 +58,8 @@ amsel_engine_init (AmselEngine *self)
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (AMSEL_REQUEST_TYPE_RSS), amsel_parser_rss_new ());
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (AMSEL_REQUEST_TYPE_ATOM), amsel_parser_atom_new ());
 
-  self->cache = amsel_cache_new (AMSEL_DATABASE (amsel_sqlite_database_new ("amsel.db")));
+  g_autoptr (AmselDatabase) database = AMSEL_DATABASE (amsel_sqlite_database_new ("amsel.db"));
+  self->cache = amsel_cache_new (database);
 }
 
 gboolean

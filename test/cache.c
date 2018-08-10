@@ -47,9 +47,13 @@ test_add_channel_error (void)
   GError *error = NULL;
   AmselChannel *channel = amsel_channel_new ("");
 
-  AmselCache *cache = amsel_cache_new (AMSEL_DATABASE (amsel_memory_database_new ()));
+  g_autoptr (AmselDatabase) database = AMSEL_DATABASE (amsel_memory_database_new ());
+  AmselCache *cache = amsel_cache_new (database);
   amsel_cache_add_channel (cache, channel, &error);
+  g_object_unref (channel);
   g_assert_error (error, AMSEL_CACHE_ERROR, AMSEL_CACHE_ERROR_NO_SOURCE);
+  g_clear_error (&error);
+  g_object_unref (cache);
 }
 
 int

@@ -20,8 +20,11 @@ test_parse_rfc822 (void)
     g_assert_cmpint (8, ==, g_date_time_get_hour (parsedDate));
     g_assert_cmpint (7, ==, g_date_time_get_minute (parsedDate));
     g_assert_cmpint (37, ==, g_date_time_get_second (parsedDate));
+
+    g_date_time_unref (parsedDate);
   }
 
+  g_ptr_array_free (testdates, TRUE);
 }
 
 int
