@@ -2,7 +2,6 @@ tests = [
   'engine',
   'utils',
   'stresstest',
-  'cache',
 ]
 
 test_deps = [
@@ -19,6 +18,22 @@ foreach t : tests
 
   test(t, exe)
 endforeach
+
+# Cache test
+exe = executable('cache', ['cache.c', 'amsel-memory-database.c'], dependencies: test_deps,
+  link_with: amsel_lib,
+  include_directories: inc,
+)
+
+test('cache', exe)
+
+# Database test
+exe = executable('database', ['database.c', 'amsel-memory-database.c'], dependencies: test_deps,
+  link_with: amsel_lib,
+  include_directories: inc,
+)
+
+test('database', exe)
 
 # exe = executable('store', ['store.c', '../src/amsel-store.c'],
 #   dependencies: [

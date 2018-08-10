@@ -1,0 +1,129 @@
+G_DEFINE_INTERFACE	amsel-parser.c	/^G_DEFINE_INTERFACE (AmselParser, amsel_parser, G_TYPE_OBJECT)$/;"	f	file:
+amsel_parser_parse	amsel-parser.c	/^amsel_parser_parse (AmselParser  *self,$/;"	f	typeref:typename:GPtrArray *
+AMSEL_TYPE_PARSER	amsel-parser.h	/^#define AMSEL_TYPE_PARSER /;"	d
+_AmselParserInterface	amsel-parser.h	/^struct _AmselParserInterface$/;"	s
+parent	amsel-parser.h	/^  GTypeInterface parent;$/;"	m	struct:_AmselParserInterface	typeref:typename:GTypeInterface
+parse	amsel-parser.h	/^  GPtrArray * (*parse) (AmselParser  *self,$/;"	m	struct:_AmselParserInterface	typeref:typename:GPtrArray * (*)(AmselParser * self,AmselRequest * request)
+amsel_parser_parse	amsel-parser.h	/^GPtrArray *amsel_parser_parse (AmselParser  *self,$/;"	p	typeref:typename:GPtrArray *
+G_DEFINE_INTERFACE	amsel-validator.c	/^G_DEFINE_INTERFACE (AmselValidator, amsel_validator, G_TYPE_OBJECT)$/;"	f	file:
+amsel_validator_validate	amsel-validator.c	/^amsel_validator_validate (AmselValidator *self,$/;"	f	typeref:typename:gboolean
+AMSEL_TYPE_PARSER_RSS	amsel-parser-rss.h	/^#define AMSEL_TYPE_PARSER_RSS /;"	d
+G_DECLARE_FINAL_TYPE	amsel-parser-rss.h	/^G_DECLARE_FINAL_TYPE (AmselParserRss, amsel_parser_rss, AMSEL, PARSER_RSS, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+__anonca63c8c30103	amsel-request.h	/^typedef enum {$/;"	g
+AMSEL_REQUEST_TYPE_UNDECIDED	amsel-request.h	/^  AMSEL_REQUEST_TYPE_UNDECIDED,$/;"	e	enum:__anonca63c8c30103
+AMSEL_REQUEST_TYPE_RSS	amsel-request.h	/^  AMSEL_REQUEST_TYPE_RSS,$/;"	e	enum:__anonca63c8c30103
+AMSEL_REQUEST_TYPE_ATOM	amsel-request.h	/^  AMSEL_REQUEST_TYPE_ATOM,$/;"	e	enum:__anonca63c8c30103
+AmselRequestType	amsel-request.h	/^} AmselRequestType;$/;"	t	typeref:enum:__anonca63c8c30103
+AmselRequest	amsel-request.h	/^typedef struct _AmselRequest AmselRequest;$/;"	t	typeref:struct:_AmselRequest
+amsel_request_new	amsel-request.h	/^AmselRequest     *amsel_request_new      (const char       *data,$/;"	p	typeref:typename:AmselRequest *
+amsel_request_set_type	amsel-request.h	/^void              amsel_request_set_type (AmselRequest     *self,$/;"	p	typeref:typename:void
+amsel_request_get_data	amsel-request.h	/^char             *amsel_request_get_data (AmselRequest     *self);$/;"	p	typeref:typename:char *
+amsel_request_get_size	amsel-request.h	/^gsize             amsel_request_get_size (AmselRequest     *self);$/;"	p	typeref:typename:gsize
+amsel_request_get_type	amsel-request.h	/^AmselRequestType  amsel_request_get_type (AmselRequest     *self);$/;"	p	typeref:typename:AmselRequestType
+amsel_request_free	amsel-request.h	/^void              amsel_request_free     (AmselRequest     *self);$/;"	p	typeref:typename:void
+AMSEL_TYPE_VALIDATOR_RSS	amsel-validator-rss.h	/^#define AMSEL_TYPE_VALIDATOR_RSS /;"	d
+G_DECLARE_FINAL_TYPE	amsel-validator-rss.h	/^G_DECLARE_FINAL_TYPE (AmselValidatorRss, amsel_validator_rss, AMSEL, VALIDATOR_RSS, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+AMSEL_TYPE_CACHE	amsel-cache.h	/^#define AMSEL_TYPE_CACHE /;"	d
+G_DECLARE_FINAL_TYPE	amsel-cache.h	/^G_DECLARE_FINAL_TYPE (AmselCache, amsel_cache, AMSEL, CACHE, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+amsel_cache_add_channel	amsel-cache.h	/^AmselChannel *amsel_cache_add_channel (AmselCache   *self,$/;"	p	typeref:typename:AmselChannel *
+AMSEL_TYPE_ENGINE	amsel-engine.h	/^#define AMSEL_TYPE_ENGINE /;"	d
+G_DECLARE_FINAL_TYPE	amsel-engine.h	/^G_DECLARE_FINAL_TYPE (AmselEngine, amsel_engine, AMSEL, ENGINE, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+amsel_engine_validate	amsel-engine.h	/^gboolean     amsel_engine_validate     (AmselEngine  *self,$/;"	p	typeref:typename:gboolean
+amsel_engine_parse	amsel-engine.h	/^GPtrArray   *amsel_engine_parse        (AmselEngine  *self,$/;"	p	typeref:typename:GPtrArray *
+amsel_engine_get_channels	amsel-engine.h	/^GPtrArray   *amsel_engine_get_channels (AmselEngine  *self);$/;"	p	typeref:typename:GPtrArray *
+_AmselCache	amsel-cache.c	/^struct _AmselCache$/;"	s	file:
+parent_instance	amsel-cache.c	/^  GObject parent_instance;$/;"	m	struct:_AmselCache	typeref:typename:GObject	file:
+channels	amsel-cache.c	/^  GHashTable *channels;$/;"	m	struct:_AmselCache	typeref:typename:GHashTable *	file:
+G_DEFINE_TYPE	amsel-cache.c	/^G_DEFINE_TYPE (AmselCache, amsel_cache, G_TYPE_OBJECT)$/;"	f
+amsel_cache_finalize	amsel-cache.c	/^amsel_cache_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_cache_class_init	amsel-cache.c	/^amsel_cache_class_init (AmselCacheClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_cache_init	amsel-cache.c	/^amsel_cache_init (AmselCache *self)$/;"	f	typeref:typename:void	file:
+amsel_cache_merge_channel_properties	amsel-cache.c	/^amsel_cache_merge_channel_properties (AmselCache   *self,$/;"	f	typeref:typename:void	file:
+amsel_cache_merge_entry	amsel-cache.c	/^amsel_cache_merge_entry (AmselCache   *self,$/;"	f	typeref:typename:gboolean	file:
+amsel_cache_merge_channels	amsel-cache.c	/^amsel_cache_merge_channels (AmselCache   *self,$/;"	f	typeref:typename:void	file:
+amsel_cache_add_channel	amsel-cache.c	/^amsel_cache_add_channel (AmselCache   *self,$/;"	f	typeref:typename:AmselChannel *
+AMSEL_TYPE_VALIDATOR_ATOM	amsel-validator-atom.h	/^#define AMSEL_TYPE_VALIDATOR_ATOM /;"	d
+G_DECLARE_FINAL_TYPE	amsel-validator-atom.h	/^G_DECLARE_FINAL_TYPE (AmselValidatorAtom, amsel_validator_atom, AMSEL, VALIDATOR_ATOM, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+_AmselParserAtom	amsel-parser-atom.c	/^struct _AmselParserAtom$/;"	s	file:
+parent_instance	amsel-parser-atom.c	/^  GObject parent_instance;$/;"	m	struct:_AmselParserAtom	typeref:typename:GObject	file:
+amsel_parser_atom_iface_init	amsel-parser-atom.c	/^static void amsel_parser_atom_iface_init (AmselParserInterface *iface);$/;"	p	typeref:typename:void	file:
+G_DEFINE_TYPE_WITH_CODE	amsel-parser-atom.c	/^G_DEFINE_TYPE_WITH_CODE (AmselParserAtom, amsel_parser_atom, G_TYPE_OBJECT,$/;"	f
+amsel_parser_atom_finalize	amsel-parser-atom.c	/^amsel_parser_atom_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_parser_atom_class_init	amsel-parser-atom.c	/^amsel_parser_atom_class_init (AmselParserAtomClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_parser_atom_init	amsel-parser-atom.c	/^amsel_parser_atom_init (AmselParserAtom *self)$/;"	f	typeref:typename:void	file:
+HANDLE_CHANNEL_NODE	amsel-parser-atom.c	/^#define HANDLE_CHANNEL_NODE(/;"	d	file:
+HANDLE_ITEM_NODE	amsel-parser-atom.c	/^#define HANDLE_ITEM_NODE(/;"	d	file:
+amsel_parser_atom_parse_item	amsel-parser-atom.c	/^amsel_parser_atom_parse_item (AmselParser *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_atom_parse_channel	amsel-parser-atom.c	/^amsel_parser_atom_parse_channel (AmselParser  *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_atom_internal_parse	amsel-parser-atom.c	/^amsel_parser_atom_internal_parse (AmselParser *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_atom_parse	amsel-parser-atom.c	/^amsel_parser_atom_parse (AmselParser  *parser,$/;"	f	typeref:typename:GPtrArray *
+amsel_parser_atom_iface_init	amsel-parser-atom.c	/^amsel_parser_atom_iface_init (AmselParserInterface *iface)$/;"	f	typeref:typename:void	file:
+_AmselValidatorAtom	amsel-validator-atom.c	/^struct _AmselValidatorAtom$/;"	s	file:
+parent_instance	amsel-validator-atom.c	/^  GObject parent_instance;$/;"	m	struct:_AmselValidatorAtom	typeref:typename:GObject	file:
+validctxt	amsel-validator-atom.c	/^  xmlRelaxNGValidCtxtPtr validctxt;$/;"	m	struct:_AmselValidatorAtom	typeref:typename:xmlRelaxNGValidCtxtPtr	file:
+schema	amsel-validator-atom.c	/^  xmlRelaxNGPtr schema;$/;"	m	struct:_AmselValidatorAtom	typeref:typename:xmlRelaxNGPtr	file:
+amsel_validator_atom_iface_init	amsel-validator-atom.c	/^static void amsel_validator_atom_iface_init (AmselValidatorInterface *iface);$/;"	p	typeref:typename:void	file:
+G_DEFINE_TYPE_WITH_CODE	amsel-validator-atom.c	/^G_DEFINE_TYPE_WITH_CODE (AmselValidatorAtom, amsel_validator_atom, G_TYPE_OBJECT,$/;"	f
+amsel_validator_atom_finalize	amsel-validator-atom.c	/^amsel_validator_atom_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_validator_atom_class_init	amsel-validator-atom.c	/^amsel_validator_atom_class_init (AmselValidatorAtomClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_validator_atom_init	amsel-validator-atom.c	/^amsel_validator_atom_init (AmselValidatorAtom *self)$/;"	f	typeref:typename:void	file:
+amsel_validator_atom_validate	amsel-validator-atom.c	/^amsel_validator_atom_validate (AmselValidator *validator,$/;"	f	typeref:typename:gboolean	file:
+amsel_validator_atom_iface_init	amsel-validator-atom.c	/^amsel_validator_atom_iface_init (AmselValidatorInterface *iface)$/;"	f	typeref:typename:void	file:
+AMSEL_TYPE_PARSER_ATOM	amsel-parser-atom.h	/^#define AMSEL_TYPE_PARSER_ATOM /;"	d
+G_DECLARE_FINAL_TYPE	amsel-parser-atom.h	/^G_DECLARE_FINAL_TYPE (AmselParserAtom, amsel_parser_atom, AMSEL, PARSER_ATOM, GObject)$/;"	p	typeref:typename:G_BEGIN_DECLS
+_AmselEngine	amsel-engine.c	/^struct _AmselEngine$/;"	s	file:
+parent_instance	amsel-engine.c	/^  GObject parent_instance;$/;"	m	struct:_AmselEngine	typeref:typename:GObject	file:
+validators	amsel-engine.c	/^  GList *validators;$/;"	m	struct:_AmselEngine	typeref:typename:GList *	file:
+parsers	amsel-engine.c	/^  GHashTable *parsers;$/;"	m	struct:_AmselEngine	typeref:typename:GHashTable *	file:
+cache	amsel-engine.c	/^  AmselCache *cache;$/;"	m	struct:_AmselEngine	typeref:typename:AmselCache *	file:
+G_DEFINE_TYPE	amsel-engine.c	/^G_DEFINE_TYPE (AmselEngine, amsel_engine, G_TYPE_OBJECT)$/;"	f
+amsel_engine_finalize	amsel-engine.c	/^amsel_engine_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_engine_class_init	amsel-engine.c	/^amsel_engine_class_init (AmselEngineClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_engine_init	amsel-engine.c	/^amsel_engine_init (AmselEngine *self)$/;"	f	typeref:typename:void	file:
+amsel_engine_validate	amsel-engine.c	/^amsel_engine_validate (AmselEngine  *self,$/;"	f	typeref:typename:gboolean
+amsel_engine_parse	amsel-engine.c	/^amsel_engine_parse (AmselEngine  *self,$/;"	f	typeref:typename:GPtrArray *
+amsel_engine_get_channels	amsel-engine.c	/^amsel_engine_get_channels (AmselEngine  *self)$/;"	f	typeref:typename:GPtrArray *
+_AmselValidatorRss	amsel-validator-rss.c	/^struct _AmselValidatorRss$/;"	s	file:
+parent_instance	amsel-validator-rss.c	/^  GObject parent_instance;$/;"	m	struct:_AmselValidatorRss	typeref:typename:GObject	file:
+validctxt	amsel-validator-rss.c	/^  xmlSchemaValidCtxtPtr validctxt;$/;"	m	struct:_AmselValidatorRss	typeref:typename:xmlSchemaValidCtxtPtr	file:
+schema	amsel-validator-rss.c	/^  xmlSchemaPtr schema;$/;"	m	struct:_AmselValidatorRss	typeref:typename:xmlSchemaPtr	file:
+amsel_validator_rss_iface_init	amsel-validator-rss.c	/^static void amsel_validator_rss_iface_init (AmselValidatorInterface *iface);$/;"	p	typeref:typename:void	file:
+G_DEFINE_TYPE_WITH_CODE	amsel-validator-rss.c	/^G_DEFINE_TYPE_WITH_CODE (AmselValidatorRss, amsel_validator_rss, G_TYPE_OBJECT,$/;"	f
+amsel_validator_rss_finalize	amsel-validator-rss.c	/^amsel_validator_rss_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_validator_rss_class_init	amsel-validator-rss.c	/^amsel_validator_rss_class_init (AmselValidatorRssClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_validator_rss_init	amsel-validator-rss.c	/^amsel_validator_rss_init (AmselValidatorRss *self)$/;"	f	typeref:typename:void	file:
+amsel_validator_rss_validate	amsel-validator-rss.c	/^amsel_validator_rss_validate (AmselValidator *validator,$/;"	f	typeref:typename:gboolean
+amsel_validator_rss_iface_init	amsel-validator-rss.c	/^amsel_validator_rss_iface_init (AmselValidatorInterface *iface)$/;"	f	typeref:typename:void	file:
+_AmselRequest	amsel-request.c	/^struct _AmselRequest {$/;"	s	file:
+type	amsel-request.c	/^  AmselRequestType type;$/;"	m	struct:_AmselRequest	typeref:typename:AmselRequestType	file:
+data	amsel-request.c	/^  char *data;$/;"	m	struct:_AmselRequest	typeref:typename:char *	file:
+size	amsel-request.c	/^  gsize size;$/;"	m	struct:_AmselRequest	typeref:typename:gsize	file:
+determine_type	amsel-request.c	/^static AmselRequestType determine_type (const char *data,$/;"	p	typeref:typename:AmselRequestType	file:
+amsel_request_new	amsel-request.c	/^amsel_request_new (const char *data,$/;"	f	typeref:typename:AmselRequest *
+determine_type	amsel-request.c	/^determine_type (const char *data,$/;"	f	typeref:typename:AmselRequestType	file:
+amsel_request_free	amsel-request.c	/^amsel_request_free (AmselRequest *self)$/;"	f	typeref:typename:void
+amsel_request_get_data	amsel-request.c	/^amsel_request_get_data (AmselRequest *self)$/;"	f	typeref:typename:char *
+amsel_request_get_size	amsel-request.c	/^amsel_request_get_size (AmselRequest *self)$/;"	f	typeref:typename:gsize
+amsel_request_get_type	amsel-request.c	/^amsel_request_get_type (AmselRequest *self)$/;"	f	typeref:typename:AmselRequestType
+amsel_request_set_type	amsel-request.c	/^amsel_request_set_type (AmselRequest     *self,$/;"	f	typeref:typename:void
+process_node	amsel-parser-rss.c	/^typedef void (*process_node) (AmselParser *parser,$/;"	t	typeref:typename:void (*)(AmselParser * parser,xmlNodePtr node)	file:
+_AmselParserRss	amsel-parser-rss.c	/^struct _AmselParserRss$/;"	s	file:
+parent_instance	amsel-parser-rss.c	/^  GObject parent_instance;$/;"	m	struct:_AmselParserRss	typeref:typename:GObject	file:
+amsel_parser_iface_init	amsel-parser-rss.c	/^static void amsel_parser_iface_init (AmselParserInterface *iface);$/;"	p	typeref:typename:void	file:
+G_DEFINE_TYPE_WITH_CODE	amsel-parser-rss.c	/^G_DEFINE_TYPE_WITH_CODE (AmselParserRss, amsel_parser_rss, G_TYPE_OBJECT,$/;"	f
+amsel_parser_rss_finalize	amsel-parser-rss.c	/^amsel_parser_rss_finalize (GObject *object)$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_class_init	amsel-parser-rss.c	/^amsel_parser_rss_class_init (AmselParserRssClass *klass)$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_init	amsel-parser-rss.c	/^amsel_parser_rss_init (AmselParserRss *self)$/;"	f	typeref:typename:void	file:
+HANDLE_CHANNEL_NODE	amsel-parser-rss.c	/^#define HANDLE_CHANNEL_NODE(/;"	d	file:
+HANDLE_ITEM_NODE	amsel-parser-rss.c	/^#define HANDLE_ITEM_NODE(/;"	d	file:
+amsel_parser_rss_parse_item	amsel-parser-rss.c	/^amsel_parser_rss_parse_item (AmselParser *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_parse_image	amsel-parser-rss.c	/^amsel_parser_rss_parse_image (AmselParser  *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_parse_channel	amsel-parser-rss.c	/^amsel_parser_rss_parse_channel (AmselParser  *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_internal_parse	amsel-parser-rss.c	/^amsel_parser_rss_internal_parse (AmselParser *parser,$/;"	f	typeref:typename:void	file:
+amsel_parser_rss_parse	amsel-parser-rss.c	/^amsel_parser_rss_parse (AmselParser  *parser,$/;"	f	typeref:typename:GPtrArray *
+amsel_parser_iface_init	amsel-parser-rss.c	/^amsel_parser_iface_init (AmselParserInterface *iface)$/;"	f	typeref:typename:void	file:
+AMSEL_TYPE_VALIDATOR	amsel-validator.h	/^#define AMSEL_TYPE_VALIDATOR /;"	d
+_AmselValidatorInterface	amsel-validator.h	/^struct _AmselValidatorInterface$/;"	s
+parent	amsel-validator.h	/^  GTypeInterface parent;$/;"	m	struct:_AmselValidatorInterface	typeref:typename:GTypeInterface
+validate	amsel-validator.h	/^  gboolean (*validate) (AmselValidator *self,$/;"	m	struct:_AmselValidatorInterface	typeref:typename:gboolean (*)(AmselValidator * self,char * data)
+amsel_validator_validate	amsel-validator.h	/^gboolean amsel_validator_validate (AmselValidator *self,$/;"	p	typeref:typename:gboolean

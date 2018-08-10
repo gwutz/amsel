@@ -1,0 +1,1 @@
+option('enable_tracing', type: 'boolean', value: false, description: 'Enable tracing of internals for troubleshooting Amsel')

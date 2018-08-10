@@ -9,10 +9,11 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (AmselEngine, amsel_engine, AMSEL, ENGINE, GObject)
 
-AmselEngine *amsel_engine_new (void);
-gboolean     amsel_engine_validate (AmselEngine  *self,
-                                    AmselRequest *request);
-GPtrArray   *amsel_engine_parse    (AmselEngine  *self,
-                                    AmselRequest *request);
+AmselEngine *amsel_engine_new          (void);
+gboolean     amsel_engine_validate     (AmselEngine  *self,
+                                        AmselRequest *request);
+GPtrArray   *amsel_engine_parse        (AmselEngine  *self,
+                                        AmselRequest *request);
+GPtrArray   *amsel_engine_get_channels (AmselEngine  *self);
 
 G_END_DECLS

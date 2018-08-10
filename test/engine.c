@@ -124,6 +124,12 @@ test_parse_rss (void)
         }
     }
   g_ptr_array_unref (channels);
+
+  /** test persistence of channel */
+  channels = amsel_engine_get_channels (engine);
+  g_assert_nonnull (channels);
+  g_assert_cmpint (channels->len, ==, 1);
+  g_ptr_array_unref (channels);
 }
 
 void
@@ -132,7 +138,7 @@ test_parse_atom (void)
   GError *error = NULL;
   g_autoptr (AmselEngine) engine;
   AmselRequest *request;
-  g_autoptr (GPtrArray) channels;
+  GPtrArray *channels;
   g_autofree char *xml;
   gsize length;
 
@@ -173,6 +179,13 @@ test_parse_atom (void)
           g_assert_cmpstr (amsel_entry_get_id (item), ==, "Post 1 ID");
         }
     }
+  g_ptr_array_unref (channels);
+
+  /** test persistence of channel */
+  channels = amsel_engine_get_channels (engine);
+  g_assert_nonnull (channels);
+  g_assert_cmpint (channels->len, ==, 1);
+  g_ptr_array_unref (channels);
 }
 
 void

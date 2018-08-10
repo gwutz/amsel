@@ -2,6 +2,8 @@
 #include "amsel-config.h"
 #include "amsel-engine.h"
 #include "amsel-channel.h"
+#include "amsel-cache.h"
+#include "amsel-memory-database.h"
 
 static void
 test_add_items (void)
@@ -31,6 +33,23 @@ test_add_items (void)
 
   g_assert_cmpint (g_hash_table_size (entries), ==, 42);
   g_ptr_array_unref (channels);
+
+  /** test persistence of channel */
+  channels = amsel_engine_get_channels (engine);
+  g_assert_nonnull (channels);
+  g_assert_cmpint (channels->len, ==, 1);
+  g_ptr_array_unref (channels);
+}
+
+void
+test_add_channel_error (void)
+{
+  GError *error = NULL;
+  AmselChannel *channel = amsel_channel_new ("");
+
+  AmselCache *cache = amsel_cache_new (AMSEL_DATABASE (amsel_memory_database_new ()));
+  amsel_cache_add_channel (cache, channel, &error);
+  g_assert_error (error, AMSEL_CACHE_ERROR, AMSEL_CACHE_ERROR_NO_SOURCE);
 }
 
 int
@@ -40,6 +59,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   g_test_add_func ("/cache/items", test_add_items);
+  g_test_add_func ("/cache/add_channel_error", test_add_channel_error);
 
   return g_test_run ();
 }

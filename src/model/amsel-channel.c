@@ -1,4 +1,5 @@
 #include "amsel-channel.h"
+#include "amsel-debug.h"
 
 struct _AmselChannel
 {
@@ -51,6 +52,8 @@ amsel_channel_finalize (GObject *object)
   g_clear_pointer (&self->icon, g_free);
 
   g_hash_table_unref (self->entries);
+
+  TRACE_MSG ("%s", "Finalize Channel");
 
   G_OBJECT_CLASS (amsel_channel_parent_class)->finalize (object);
 }

@@ -6,6 +6,8 @@
 #include "amsel-parser-rss.h"
 #include "amsel-parser-atom.h"
 #include "amsel-cache.h"
+#include "amsel-sqlite-database.h"
+#include "amsel-debug.h"
 
 struct _AmselEngine
 {
@@ -17,13 +19,6 @@ struct _AmselEngine
 };
 
 G_DEFINE_TYPE (AmselEngine, amsel_engine, G_TYPE_OBJECT)
-
-/* enum { */
-/*   PROP_0, */
-/*   N_PROPS */
-/* }; */
-
-/* static GParamSpec *properties [N_PROPS]; */
 
 AmselEngine *
 amsel_engine_new (void)
@@ -42,36 +37,6 @@ amsel_engine_finalize (GObject *object)
 
   G_OBJECT_CLASS (amsel_engine_parent_class)->finalize (object);
 }
-
-/* static void */
-/* amsel_engine_get_property (GObject    *object, */
-/*                            guint       prop_id, */
-/*                            GValue     *value, */
-/*                            GParamSpec *pspec) */
-/* { */
-/*   AmselEngine *self = AMSEL_ENGINE (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
-
-/* static void */
-/* amsel_engine_set_property (GObject      *object, */
-/*                            guint         prop_id, */
-/*                            const GValue *value, */
-/*                            GParamSpec   *pspec) */
-/* { */
-/*   AmselEngine *self = AMSEL_ENGINE (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
 
 static void
 amsel_engine_class_init (AmselEngineClass *klass)
@@ -93,7 +58,7 @@ amsel_engine_init (AmselEngine *self)
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (AMSEL_REQUEST_TYPE_RSS), amsel_parser_rss_new ());
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (AMSEL_REQUEST_TYPE_ATOM), amsel_parser_atom_new ());
 
-  self->cache = amsel_cache_new ();
+  self->cache = amsel_cache_new (AMSEL_DATABASE (amsel_sqlite_database_new ("amsel.db")));
 }
 
 gboolean
@@ -141,8 +106,9 @@ amsel_engine_parse (AmselEngine  *self,
   g_return_val_if_fail (request != NULL, NULL);
   g_return_val_if_fail (amsel_request_get_data (request) != NULL, NULL);
 
+  GError *error = NULL;
   GPtrArray *channels;
-  GPtrArray *ret = g_ptr_array_new ();
+  GPtrArray *ret = g_ptr_array_new_with_free_func (NULL);
 
   AmselParser *parser = g_hash_table_lookup (self->parsers, GINT_TO_POINTER (amsel_request_get_type (request)));
   if (parser == NULL) {
@@ -152,10 +118,24 @@ amsel_engine_parse (AmselEngine  *self,
   channels = amsel_parser_parse (AMSEL_PARSER (parser), request);
   for (int i = 0; i < channels->len; i++)
     {
-      AmselChannel *c = amsel_cache_add_channel (self->cache, g_ptr_array_index (channels, i));
+      AmselChannel *channel = g_ptr_array_index (channels, i);
+      AmselChannel *c = amsel_cache_add_channel (self->cache, channel, &error);
+      if (error != NULL) {
+        g_warning ("%s", error->message);
+        continue;
+      }
       g_ptr_array_add (ret, c);
     }
+
   g_ptr_array_unref (channels);
 
   return ret;
+}
+
+GPtrArray *
+amsel_engine_get_channels (AmselEngine  *self)
+{
+  g_return_val_if_fail (AMSEL_IS_ENGINE (self), NULL);
+
+  return amsel_cache_get_channels (self->cache);
 }

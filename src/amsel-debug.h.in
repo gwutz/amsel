@@ -1,0 +1,19 @@
+
+
+#include <glib.h>
+
+G_BEGIN_DECLS
+
+#ifndef AMSEL_ENABLE_TRACING
+#  define AMSEL_ENABLE_TRACING @AMSEL_ENABLE_TRACING@
+#endif
+#if AMSEL_ENABLE_TRACING != 1
+#  undef AMSEL_ENABLE_TRACING
+#endif
+
+#if AMSEL_ENABLE_TRACING
+#define TRACE_MSG(fmt, ...) \
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "TRACE: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
+#else
+#define TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
+#endif

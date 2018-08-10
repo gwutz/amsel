@@ -178,7 +178,7 @@ amsel_parser_atom_parse (AmselParser  *parser,
   xmlDocPtr doc;
   GPtrArray *channels;
 
-  channels = g_ptr_array_new ();
+  channels = g_ptr_array_new_with_free_func (g_object_unref);
 
   doc = xmlParseMemory (amsel_request_get_data (request),
                         amsel_request_get_size (request));

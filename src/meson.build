@@ -1,6 +1,15 @@
 gnome = import('gnome')
 
+amsel_conf = configuration_data()
+amsel_conf.set10('AMSEL_ENABLE_TRACING', get_option('enable_tracing'))
+amsel_debug_h = configure_file(
+  input: 'amsel-debug.h.in',
+  output: 'amsel-debug.h',
+  configuration: amsel_conf,
+)
+
 inc = include_directories(
+  '.',
   'engine',
   'model',
   'utils',
@@ -16,6 +25,8 @@ amsel_sources = [
   'engine/amsel-parser-rss.c',
   'engine/amsel-parser-atom.c',
   'engine/amsel-cache.c',
+  'engine/amsel-database.c',
+  'engine/amsel-sqlite-database.c',
   'model/amsel-channel.c',
   'model/amsel-entry.c',
   'utils/amsel-date-parser.c',
@@ -26,6 +37,7 @@ amsel_dependencies = [
   dependency('gio-2.0'),
   dependency('gobject-2.0'),
   dependency('libxml-2.0'),
+  dependency('sqlite3'),
 ]
 
 amsel_lib = static_library ('amsel',

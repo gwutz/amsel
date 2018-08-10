@@ -16,6 +16,7 @@ test_feed (AmselEngineFixture *fixture, SoupMessage *msg)
   channels = amsel_engine_parse (fixture->engine, request);
   g_assert_nonnull (channels);
   g_assert_cmpint (channels->len, >, 0);
+  amsel_request_free (request);
 }
 
 static void
@@ -64,7 +65,8 @@ main (int   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add ("/stresstest/feeds", AmselEngineFixture, NULL, stresstest_setup, stresstest_feeds, stresstest_teardown);
+  if (g_test_slow ())
+    g_test_add ("/stresstest/feeds", AmselEngineFixture, NULL, stresstest_setup, stresstest_feeds, stresstest_teardown);
 
   return g_test_run ();
 }
