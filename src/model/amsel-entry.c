@@ -305,6 +305,7 @@ amsel_entry_set_updated_datetime (AmselEntry *self,
 {
   g_return_if_fail (AMSEL_IS_ENTRY (self));
 
+  g_clear_pointer (&self->updated, g_date_time_unref);
   self->updated = g_date_time_ref (updated);
 }
 

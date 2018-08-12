@@ -27,6 +27,38 @@ test_parse_rfc822 (void)
   g_ptr_array_free (testdates, TRUE);
 }
 
+/**
+ * What happens when i define a g_autoptr variable an redefine this?
+ *
+ * 2 Options:
+ *   - nothing happens, leads to a memleak
+ *   - the cleanup gets called twice
+ *
+ * lets see
+ */
+typedef struct {
+  int placeholder;
+} data;
+
+void
+data_cleanup (data *d) {
+  g_print ("%s", "cleanup data");
+  g_free (d);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (data, data_cleanup)
+
+void
+test_autocleanup (void)
+{
+  g_autoptr (data) test = malloc (sizeof (data));
+  test->placeholder = 1;
+
+  g_free (test);
+  test = malloc (sizeof (data));
+  test->placeholder = 2;
+}
+
 int
 main (int   argc,
       char *argv[])
@@ -34,6 +66,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   g_test_add_func ("/dateparser/rfc822", test_parse_rfc822);
+  g_test_add_func ("/toys/autocleanup", test_autocleanup);
 
   return g_test_run ();
 }

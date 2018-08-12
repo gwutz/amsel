@@ -11,9 +11,16 @@ G_BEGIN_DECLS
 #  undef AMSEL_ENABLE_TRACING
 #endif
 
+#ifndef AM_LOG_LEVEL_TRACE
+#define AM_LOG_LEVEL_TRACE ((GLogLevelFlags)(1 << G_LOG_LEVEL_USER_SHIFT))
+#endif
+
 #if AMSEL_ENABLE_TRACING
-#define TRACE_MSG(fmt, ...) \
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "TRACE: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
+#define AM_TRACE_MSG(fmt, ...) \
+	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "MSG: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
+#define AM_ENTRY \
+	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "ENTRY: %s():%d", G_STRFUNC, __LINE__)
 #else
-#define TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
+#define AM_TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
+#define AM_ENTRY               G_STMT_START { } G_STMT_END
 #endif

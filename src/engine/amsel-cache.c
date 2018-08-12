@@ -37,6 +37,8 @@ amsel_cache_finalize (GObject *object)
 {
   AmselCache *self = (AmselCache *)object;
 
+  AM_TRACE_MSG ("Finalize Cache...");
+
   g_hash_table_unref (self->channels);
   g_clear_object (&self->database);
 
@@ -176,6 +178,8 @@ amsel_cache_add_channel (AmselCache    *self,
                          GError       **error)
 {
   g_return_val_if_fail (AMSEL_IS_CACHE (self), channel);
+
+  AM_TRACE_MSG ("%s", "Adding channel via Cache");
 
   GError *db_error = NULL;
   AmselChannel *existingChannel = NULL;

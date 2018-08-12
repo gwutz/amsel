@@ -53,7 +53,7 @@ amsel_channel_finalize (GObject *object)
 
   g_hash_table_unref (self->entries);
 
-  TRACE_MSG ("%s", "Finalize Channel");
+  AM_TRACE_MSG ("%s", "Finalize Channel");
 
   G_OBJECT_CLASS (amsel_channel_parent_class)->finalize (object);
 }
@@ -316,8 +316,9 @@ amsel_channel_add_entry (AmselChannel *self,
                          AmselEntry   *entry)
 {
   g_return_if_fail (AMSEL_IS_CHANNEL (self));
+  g_return_if_fail (AMSEL_IS_ENTRY (entry));
 
-  g_hash_table_insert (self->entries, (char *)amsel_entry_get_id (entry), entry);
+  g_hash_table_insert (self->entries, (char *)amsel_entry_get_id (entry), g_object_ref(entry));
 }
 
 /**

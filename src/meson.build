@@ -30,6 +30,7 @@ amsel_sources = [
   'model/amsel-channel.c',
   'model/amsel-entry.c',
   'utils/amsel-date-parser.c',
+  'utils/amsel-sqlite-helper.c',
 ]
 
 amsel_dependencies = [

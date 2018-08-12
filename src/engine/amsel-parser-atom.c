@@ -143,7 +143,7 @@ amsel_parser_atom_parse_channel (AmselParser  *parser,
       }
     else if (!xmlStrcmp (cur->name, BAD_CAST "entry"))
       {
-        AmselEntry *item = amsel_entry_new ();
+        g_autoptr (AmselEntry) item = amsel_entry_new ();
         amsel_parser_atom_parse_item (parser, item, doc, cur->xmlChildrenNode);
         amsel_channel_add_entry (channel, item);
       }

@@ -16,7 +16,7 @@ foreach t : tests
     include_directories: inc,
   )
 
-  test(t, exe)
+  test(t, exe, is_parallel: false)
 endforeach
 
 # Cache test
@@ -25,7 +25,7 @@ exe = executable('cache', ['cache.c', 'amsel-memory-database.c'], dependencies: 
   include_directories: inc,
 )
 
-test('cache', exe)
+test('cache', exe, is_parallel: false)
 
 # Database test
 exe = executable('database', ['database.c', 'amsel-memory-database.c'], dependencies: test_deps,
@@ -33,7 +33,7 @@ exe = executable('database', ['database.c', 'amsel-memory-database.c'], dependen
   include_directories: inc,
 )
 
-test('database', exe)
+test('database', exe, is_parallel: false)
 
 # exe = executable('store', ['store.c', '../src/amsel-store.c'],
 #   dependencies: [

@@ -158,7 +158,7 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
       else if HANDLE_CHANNEL_NODE(link, amsel_channel_set_source)
       else if (!xmlStrcmp (cur->name, BAD_CAST "item"))
         {
-          AmselEntry *item = amsel_entry_new ();
+          g_autoptr (AmselEntry) item = amsel_entry_new ();
           amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
           amsel_channel_add_entry (channel, item);
         }
