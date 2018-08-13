@@ -1,4 +1,4 @@
-project('amsel', 'c',        version: '0.1.0',
+project('alb', 'c',        version: '0.1.0',
   meson_version: '>= 0.42.0',
 )
 
