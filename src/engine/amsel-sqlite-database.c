@@ -264,6 +264,12 @@ amsel_sqlite_database_get_entries_for_channel (AmselSqliteDatabase *self,
             amsel_entry_set_title (entry, (const char *) sqlite3_column_text (stmt, i));
           else if (g_strcmp0 (column_name, "content") == 0)
             amsel_entry_set_content (entry, (const char *) sqlite3_column_text (stmt, i));
+          else if (g_strcmp0 (column_name, "updated") == 0) {
+            g_autoptr (GDateTime) updated = g_date_time_new_from_unix_local (sqlite3_column_int64 (stmt, i));
+            amsel_entry_set_updated_datetime (entry, updated);
+          }
+          else if (g_strcmp0 (column_name, "link") == 0)
+            amsel_entry_set_link (entry, (const char *) sqlite3_column_text (stmt, i));
         }
 
       amsel_channel_add_entry (channel, entry);

@@ -51,15 +51,21 @@ test_init_database2 (void)
     char *id;
     char *title;
     char *content;
+    GDateTime *updated;
+    char *link;
   } testentries[] = {
       {
         .id = "id1",
         .title = "title1",
         .content = "content1",
+        .updated = g_date_time_new_now_local (),
+        .link = "link1",
       }, {
         .id = "id2",
         .title = "title2",
         .content = "content2",
+        .updated = g_date_time_new_now_local (),
+        .link = "link2",
       }
   };
 
@@ -78,6 +84,8 @@ test_init_database2 (void)
       amsel_entry_set_id (entry, testentries[j].id);
       amsel_entry_set_title (entry, testentries[j].title);
       amsel_entry_set_content (entry, testentries[j].content);
+      amsel_entry_set_updated_datetime (entry, testentries[j].updated);
+      amsel_entry_set_link (entry, testentries[j].link);
 
       amsel_channel_add_entry (channel, entry);
     }
@@ -106,8 +114,16 @@ test_init_database2 (void)
 
         g_assert_cmpstr (amsel_entry_get_title (e), ==, testentries[j].title);
         g_assert_cmpstr (amsel_entry_get_content (e), ==, testentries[j].content);
+        g_assert_cmpint (g_date_time_to_unix (amsel_entry_get_updated (e)), ==, g_date_time_to_unix (testentries[j].updated));
+        g_assert_cmpstr (amsel_entry_get_link (e), ==, testentries[j].link);
       }
     }
+
+
+  for (int j = 0; j < sizeof (testentries)/sizeof(*testentries); j++) {
+    g_date_time_unref (testentries[j].updated);
+  }
+
   g_ptr_array_unref (channels);
 }
 
