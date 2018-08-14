@@ -1,4 +1,5 @@
 gnome = import('gnome')
+pkg = import('pkgconfig')
 
 amsel_conf = configuration_data()
 amsel_conf.set10('AMSEL_ENABLE_TRACING', get_option('enable_tracing'))
@@ -56,11 +57,17 @@ amsel_dependencies = [
   dependency('sqlite3'),
 ]
 
-amsel_lib = library ('amsel-1.0',
+alb_lib = library ('alb-1.0',
   amsel_sources + amsel_resources,
   dependencies: amsel_dependencies,
   c_args: ['-DALB_COMPILATION'],
   install: true,
+)
+
+pkg.generate(
+  name: 'alb-1.0',
+  description: 'the AmseL Backend - a generic rss/atom engine',
+  libraries: [alb_lib],
 )
 
 

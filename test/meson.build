@@ -12,7 +12,7 @@ test_deps = [
 
 foreach t : tests
   exe = executable(t, ['@0@.c'.format(t)], dependencies: test_deps,
-    link_with: amsel_lib,
+    link_with: alb_lib,
     include_directories: inc,
   )
 
@@ -21,7 +21,7 @@ endforeach
 
 # Cache test
 exe = executable('cache', ['cache.c', 'amsel-memory-database.c'], dependencies: test_deps,
-  link_with: amsel_lib,
+  link_with: alb_lib,
   include_directories: inc,
 )
 
@@ -29,7 +29,7 @@ test('cache', exe, is_parallel: false)
 
 # Database test
 exe = executable('database', ['database.c', 'amsel-memory-database.c'], dependencies: test_deps,
-  link_with: amsel_lib,
+  link_with: alb_lib,
   include_directories: inc,
 )
 
