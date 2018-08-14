@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glib-object.h>
-#include "model/amsel-channel.h"
+#include "amsel-channel.h"
 
 G_BEGIN_DECLS
 

@@ -1,7 +1,7 @@
 #include "amsel-parser-atom.h"
 #include "amsel-parser.h"
 #include <libxml/parser.h>
-#include "model/amsel-channel.h"
+#include "amsel-channel.h"
 
 struct _AmselParserAtom
 {

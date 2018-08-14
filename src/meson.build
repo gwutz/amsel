@@ -60,6 +60,7 @@ amsel_dependencies = [
 alb_lib = library ('alb-1.0',
   amsel_sources + amsel_resources,
   dependencies: amsel_dependencies,
+  include_directories: inc,
   c_args: ['-DALB_COMPILATION'],
   install: true,
 )

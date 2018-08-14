@@ -1,7 +1,7 @@
 #define G_LOG_DOMAIN "amsel-sqlite-database"
 #include "amsel-sqlite-database.h"
 #include "amsel-database.h"
-#include "utils/amsel-sqlite-helper.h"
+#include "amsel-sqlite-helper.h"
 #include "amsel-debug.h"
 #include <sqlite3.h>
 

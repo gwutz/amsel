@@ -1,8 +1,8 @@
-#include "engine/amsel-parser-rss.h"
-#include "engine/amsel-parser.h"
-#include "model/amsel-channel.h"
+#include "amsel-parser-rss.h"
+#include "amsel-parser.h"
+#include "amsel-channel.h"
 #include <libxml/parser.h>
-#include "utils/amsel-date-parser.h"
+#include "amsel-date-parser.h"
 
 typedef void (*process_node) (AmselParser *parser,
                               xmlNodePtr   node);

@@ -5,7 +5,7 @@
 #endif
 
 #include <glib-object.h>
-#include "model/amsel-channel.h"
+#include "amsel-channel.h"
 #include "amsel-database.h"
 
 G_BEGIN_DECLS
