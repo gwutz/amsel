@@ -68,6 +68,7 @@ pkg.generate(
   name: 'alb-1.0',
   description: 'the AmseL Backend - a generic rss/atom engine',
   libraries: [alb_lib],
+  subdirs: 'alb',
 )
 
 
