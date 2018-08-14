@@ -20,6 +20,10 @@
 
 #pragma once
 
+#if !defined (__ALB_H_INSIDE__) && !defined (ALB_COMPILATION)
+#error "Only <alb.h> could be included directly"
+#endif
+
 #include <glib-object.h>
 
 G_BEGIN_DECLS

@@ -1,5 +1,9 @@
 #pragma once
 
+#if !defined (__ALB_H_INSIDE__) && !defined (ALB_COMPILATION)
+#error "Only <alb.h> could be included directly"
+#endif
+
 #define _XOPEN_SOURCE  600
 
 #include <glib.h>
