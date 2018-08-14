@@ -1,8 +1,9 @@
 #include <glib.h>
-#include "amsel-cache.h"
+/* #include "amsel-cache.h" */
+/* #include "amsel-sqlite-database.h" */
+/* #include "amsel-debug.h" */
 #include "amsel-memory-database.h"
-#include "amsel-sqlite-database.h"
-#include "amsel-debug.h"
+#include "alb.h"
 
 void
 test_init_database (void)

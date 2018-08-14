@@ -1,9 +1,10 @@
 #include <glib.h>
-#include "amsel-config.h"
-#include "amsel-engine.h"
-#include "amsel-channel.h"
-#include "amsel-cache.h"
+/* #include "amsel-config.h" */
+/* #include "amsel-engine.h" */
+/* #include "amsel-channel.h" */
+/* #include "amsel-cache.h" */
 #include "amsel-memory-database.h"
+#include "alb.h"
 
 static void
 test_add_items (void)

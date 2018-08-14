@@ -15,6 +15,21 @@ inc = include_directories(
   'utils',
 )
 
+amsel_public_headers = [
+  'alb.h',
+
+  'engine/amsel-engine.h',
+  'engine/amsel-request.h',
+  'engine/amsel-validator.h',
+  'engine/amsel-parser.h',
+  'engine/amsel-cache.h',
+  'engine/amsel-database.h',
+  'model/amsel-channel.h',
+  'model/amsel-entry.h',
+]
+
+install_headers(amsel_public_headers, subdir: 'alb')
+
 amsel_sources = [
   'engine/amsel-engine.c',
   'engine/amsel-request.c',
@@ -41,9 +56,11 @@ amsel_dependencies = [
   dependency('sqlite3'),
 ]
 
-amsel_lib = static_library ('amsel',
+amsel_lib = library ('amsel-1.0',
   amsel_sources + amsel_resources,
   dependencies: amsel_dependencies,
+  c_args: ['-DALB_COMPILATION'],
+  install: true,
 )
 
 
