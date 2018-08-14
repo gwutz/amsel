@@ -3,8 +3,6 @@
 
 #define __ALB_H_INSIDE__
 
-#include "amsel-config.h"
-
 #include "engine/amsel-cache.h"
 #include "engine/amsel-database.h"
 #include "engine/amsel-sqlite-database.h"

@@ -1,5 +1,5 @@
 #include <glib.h>
-/* #include "amsel-config.h" */
+#include "amsel-config.h"
 /* #include "amsel-engine.h" */
 /* #include "amsel-channel.h" */
 /* #include "amsel-cache.h" */
