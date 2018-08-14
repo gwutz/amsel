@@ -25,6 +25,7 @@ amsel_public_headers = [
   'engine/amsel-parser.h',
   'engine/amsel-cache.h',
   'engine/amsel-database.h',
+  'engine/amsel-sqlite-database.h',
   'model/amsel-channel.h',
   'model/amsel-entry.h',
 ]
