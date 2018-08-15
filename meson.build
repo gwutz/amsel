@@ -25,7 +25,7 @@ add_project_arguments([
 subdir('data')
 subdir('src')
 # subdir('plugins')
-# subdir('test')
+subdir('test')
 # subdir('po')
 # subdir('doc')
 

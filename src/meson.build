@@ -39,6 +39,7 @@ amsel_sources = [
   'engine/amsel-validator-rss.c',
   'engine/amsel-validator-atom.c',
   'engine/amsel-parser.c',
+  'engine/amsel-parser-xml.c',
   'engine/amsel-parser-rss.c',
   'engine/amsel-parser-atom.c',
   'engine/amsel-cache.c',

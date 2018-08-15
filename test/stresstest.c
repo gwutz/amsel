@@ -1,6 +1,6 @@
 #include <glib.h>
 #include <libsoup/soup.h>
-#include "amsel-engine.h"
+#include "alb.h"
 
 typedef struct {
   AmselEngine *engine;

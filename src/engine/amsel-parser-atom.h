@@ -5,12 +5,13 @@
 #endif
 
 #include <glib-object.h>
+#include "amsel-parser-xml.h"
 
 G_BEGIN_DECLS
 
 #define AMSEL_TYPE_PARSER_ATOM (amsel_parser_atom_get_type())
 
-G_DECLARE_FINAL_TYPE (AmselParserAtom, amsel_parser_atom, AMSEL, PARSER_ATOM, GObject)
+G_DECLARE_FINAL_TYPE (AmselParserAtom, amsel_parser_atom, AMSEL, PARSER_ATOM, AmselParserXml)
 
 AmselParserAtom *amsel_parser_atom_new (void);
 

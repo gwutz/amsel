@@ -1,8 +1,6 @@
 #include <glib.h>
-#include "amsel-engine.h"
-#include "amsel-request.h"
 #include "amsel-config.h"
-#include "amsel-channel.h"
+#include "alb.h"
 #include <libxml/xmlerror.h>
 
 void

@@ -5,19 +5,165 @@
 
 struct _AmselParserAtom
 {
-  GObject parent_instance;
+  AmselParserXml parent_instance;
 };
 
-static void amsel_parser_atom_iface_init (AmselParserInterface *iface);
-G_DEFINE_TYPE_WITH_CODE (AmselParserAtom, amsel_parser_atom, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (AMSEL_TYPE_PARSER, amsel_parser_atom_iface_init))
+G_DEFINE_TYPE (AmselParserAtom, amsel_parser_atom, AMSEL_TYPE_PARSER_XML);
 
-/* enum { */
-/*   PROP_0, */
-/*   N_PROPS */
-/* }; */
+static void amsel_parser_atom_parse_item (AmselParser *parser,
+                                          AmselEntry  *item,
+                                          xmlDocPtr    doc,
+                                          xmlNodePtr   cur);
 
-/* static GParamSpec *properties [N_PROPS]; */
+static void
+_channel_title (AmselParser  *parser,
+                AmselChannel *channel,
+                xmlDocPtr     doc,
+                xmlNodePtr    cur)
+{
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_channel_set_title (channel, str);
+  xmlFree (str);
+}
+
+static void
+_channel_link (AmselParser  *parser,
+               AmselChannel *channel,
+               xmlDocPtr     doc,
+               xmlNodePtr    cur)
+{
+  xmlChar *href = xmlGetProp (cur, BAD_CAST "href");
+  if (href) {
+    xmlChar *rel = xmlGetProp (cur, BAD_CAST "rel");
+    if (xmlStrEqual (rel, BAD_CAST "self"))
+      amsel_channel_set_source (channel, (const char *) href);
+    xmlFree (href);
+    xmlFree (rel);
+  }
+}
+
+static void
+_channel_entry (AmselParser  *parser,
+                AmselChannel *channel,
+                xmlDocPtr     doc,
+                xmlNodePtr    cur)
+{
+  g_autoptr (AmselEntry) item = amsel_entry_new ();
+  amsel_parser_atom_parse_item (parser, item, doc, cur->xmlChildrenNode);
+  amsel_channel_add_entry (channel, item);
+}
+
+static void
+_item_title (AmselParser *parser,
+             AmselEntry  *item,
+             xmlDocPtr    doc,
+             xmlNodePtr   cur)
+{
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_title (item, str);
+  xmlFree (str);
+}
+
+static void
+_item_content (AmselParser *parser,
+               AmselEntry  *item,
+               xmlDocPtr    doc,
+               xmlNodePtr   cur)
+{
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_content (item, str);
+  xmlFree (str);
+}
+
+static void
+_item_id (AmselParser *parser,
+          AmselEntry  *item,
+          xmlDocPtr    doc,
+          xmlNodePtr   cur)
+{
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_id (item, str);
+  xmlFree (str);
+}
+
+static void
+_item_updated (AmselParser *parser,
+               AmselEntry  *item,
+               xmlDocPtr    doc,
+               xmlNodePtr   cur)
+{
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  g_autoptr (GDateTime) updated = g_date_time_new_from_iso8601 (str, NULL);
+  amsel_entry_set_updated_datetime (item, updated);
+  xmlFree (str);
+}
+
+static void
+_item_author (AmselParser *parser,
+              AmselEntry  *item,
+              xmlDocPtr    doc,
+              xmlNodePtr   cur)
+{
+  cur = cur->xmlChildrenNode;
+  while (cur) {
+    if (!xmlStrcmp (cur->name, BAD_CAST "name")) {
+      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+      amsel_entry_set_author (item, str);
+      xmlFree (str);
+    }
+    cur = cur->next;
+  }
+}
+
+static void
+amsel_parser_atom_parse_item (AmselParser *parser,
+                              AmselEntry  *item,
+                              xmlDocPtr    doc,
+                              xmlNodePtr   cur)
+{
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (parser);
+  while (cur)
+    {
+      amsel_parser_xml_handle_item (xmlparser, (const char *) cur->name, item, doc, cur);
+
+      cur = cur->next;
+    }
+}
+
+static void
+amsel_parser_atom_parse_channel (AmselParser  *parser,
+                                 AmselChannel *channel,
+                                 xmlDocPtr     doc,
+                                 xmlNodePtr    cur)
+{
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (parser);
+
+  while (cur) {
+    amsel_parser_xml_handle_channel (xmlparser, (const char *)cur->name, channel, doc, cur);
+
+    cur = cur->next;
+  }
+}
+
+static GPtrArray *
+amsel_parser_atom_internal_parse (AmselParserXml *xmlparser,
+                                  xmlDocPtr    doc,
+                                  xmlNodePtr   node)
+{
+  AmselParser *parser = AMSEL_PARSER (xmlparser);
+  GPtrArray *channels = g_ptr_array_new ();
+  xmlNodePtr cur = node;
+
+  while (cur)
+    {
+      AmselChannel *channel = amsel_channel_new ("");
+      amsel_parser_atom_parse_channel (parser, channel, doc, cur->xmlChildrenNode);
+      g_ptr_array_add (channels, channel);
+      cur = cur->next;
+    }
+
+  return channels;
+}
 
 AmselParserAtom *
 amsel_parser_atom_new (void)
@@ -33,165 +179,28 @@ amsel_parser_atom_finalize (GObject *object)
   G_OBJECT_CLASS (amsel_parser_atom_parent_class)->finalize (object);
 }
 
-/* static void */
-/* amsel_parser_atom_get_property (GObject    *object, */
-/*                                 guint       prop_id, */
-/*                                 GValue     *value, */
-/*                                 GParamSpec *pspec) */
-/* { */
-/*   AmselParserAtom *self = AMSEL_PARSER_ATOM (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
-
-/* static void */
-/* amsel_parser_atom_set_property (GObject      *object, */
-/*                                 guint         prop_id, */
-/*                                 const GValue *value, */
-/*                                 GParamSpec   *pspec) */
-/* { */
-/*   AmselParserAtom *self = AMSEL_PARSER_ATOM (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
-
 static void
 amsel_parser_atom_class_init (AmselParserAtomClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  AmselParserXmlClass *xml_class = AMSEL_PARSER_XML_CLASS (klass);
 
   object_class->finalize = amsel_parser_atom_finalize;
-  /* object_class->get_property = amsel_parser_atom_get_property; */
-  /* object_class->set_property = amsel_parser_atom_set_property; */
+
+  xml_class->parse_xml = amsel_parser_atom_internal_parse;
 }
 
 static void
 amsel_parser_atom_init (AmselParserAtom *self)
 {
-}
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (self);
+  amsel_parser_xml_add_channel_handler (xmlparser, "title", _channel_title);
+  amsel_parser_xml_add_channel_handler (xmlparser, "link", _channel_link);
+  amsel_parser_xml_add_channel_handler (xmlparser, "entry", _channel_entry);
 
-#define HANDLE_CHANNEL_NODE(namestr, parsefunc) \
-    (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
-      parsefunc (channel, str); \
-      xmlFree (str);\
-    }
-
-#define HANDLE_ITEM_NODE(namestr, parsefunc) \
-    (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
-      parsefunc (item, str); \
-      xmlFree (str);\
-    }
-static void
-amsel_parser_atom_parse_item (AmselParser *parser,
-                              AmselEntry  *item,
-                              xmlDocPtr    doc,
-                              xmlNodePtr   cur)
-{
-  while (cur)
-    {
-      if HANDLE_ITEM_NODE (title, amsel_entry_set_title)
-      // TODO: handle different types of content
-      else if HANDLE_ITEM_NODE (content, amsel_entry_set_content)
-      else if HANDLE_ITEM_NODE (id, amsel_entry_set_id)
-      else if (!xmlStrcmp (cur->name, BAD_CAST "updated")) {
-        char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-        g_autoptr (GDateTime) updated = g_date_time_new_from_iso8601 (str, NULL);
-        amsel_entry_set_updated_datetime (item, updated);
-        xmlFree (str);
-      }
-      else if (!xmlStrcmp (cur->name, BAD_CAST "author")) {
-        xmlNodePtr oldcur = cur;
-        cur = cur->xmlChildrenNode;
-        while (cur) {
-          if HANDLE_ITEM_NODE (name, amsel_entry_set_author)
-          cur = cur->next;
-        }
-        cur = oldcur;
-      }
-      cur = cur->next;
-    }
-}
-
-static void
-amsel_parser_atom_parse_channel (AmselParser  *parser,
-                                 AmselChannel *channel,
-                                 xmlDocPtr     doc,
-                                 xmlNodePtr    cur)
-{
-  while (cur) {
-    if HANDLE_CHANNEL_NODE (title, amsel_channel_set_title)
-    else if (!xmlStrcmp (cur->name, BAD_CAST "link"))
-      {
-        xmlChar *href = xmlGetProp (cur, BAD_CAST "href");
-        if (href) {
-          xmlChar *rel = xmlGetProp (cur, BAD_CAST "rel");
-          if (xmlStrEqual (rel, BAD_CAST "self"))
-            amsel_channel_set_source (channel, (const char *) href);
-          xmlFree (href);
-          xmlFree (rel);
-        }
-      }
-    else if (!xmlStrcmp (cur->name, BAD_CAST "entry"))
-      {
-        g_autoptr (AmselEntry) item = amsel_entry_new ();
-        amsel_parser_atom_parse_item (parser, item, doc, cur->xmlChildrenNode);
-        amsel_channel_add_entry (channel, item);
-      }
-
-    cur = cur->next;
-  }
-}
-
-static void
-amsel_parser_atom_internal_parse (AmselParser *parser,
-                                  GPtrArray   *channels,
-                                  xmlDocPtr    doc,
-                                  xmlNodePtr   node)
-{
-  xmlNodePtr cur = node;
-
-  while (cur)
-    {
-      AmselChannel *channel = amsel_channel_new ("");
-      amsel_parser_atom_parse_channel (parser, channel, doc, cur->xmlChildrenNode);
-      g_ptr_array_add (channels, channel);
-      cur = cur->next;
-    }
-}
-
-GPtrArray *
-amsel_parser_atom_parse (AmselParser  *parser,
-                         AmselRequest *request)
-{
-  g_return_val_if_fail (AMSEL_IS_PARSER (parser), NULL);
-
-  xmlDocPtr doc;
-  GPtrArray *channels;
-
-  channels = g_ptr_array_new_with_free_func (g_object_unref);
-
-  doc = xmlParseMemory (amsel_request_get_data (request),
-                        amsel_request_get_size (request));
-
-  xmlNodePtr root = xmlDocGetRootElement (doc);
-  amsel_parser_atom_internal_parse (parser, channels, doc, root);
-  xmlFreeDoc (doc);
-
-  return channels;
-}
-
-static void
-amsel_parser_atom_iface_init (AmselParserInterface *iface)
-{
-  iface->parse = amsel_parser_atom_parse;
+  amsel_parser_xml_add_item_handler (xmlparser, "title", _item_title);
+  amsel_parser_xml_add_item_handler (xmlparser, "content", _item_content);
+  amsel_parser_xml_add_item_handler (xmlparser, "id", _item_id);
+  amsel_parser_xml_add_item_handler (xmlparser, "updated", _item_updated);
+  amsel_parser_xml_add_item_handler (xmlparser, "author", _item_author);
 }

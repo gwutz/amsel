@@ -1,5 +1,5 @@
 #include "amsel-memory-database.h"
-#include "amsel-database.h"
+#include "alb.h"
 #include "amsel-debug.h"
 
 struct _AmselMemoryDatabase

@@ -3,100 +3,170 @@
 #include "amsel-channel.h"
 #include <libxml/parser.h>
 #include "amsel-date-parser.h"
+#include "amsel-debug.h"
 
-typedef void (*process_node) (AmselParser *parser,
-                              xmlNodePtr   node);
+// Method announcement
+static void amsel_parser_rss_parse_item (AmselParser *parser,
+                                         AmselEntry  *item,
+                                         xmlDocPtr    doc,
+                                         xmlNodePtr   cur);
+// Method announcement
 
 struct _AmselParserRss
 {
-  GObject parent_instance;
+  AmselParserXml parent_instance;
 };
 
-static void amsel_parser_iface_init (AmselParserInterface *iface);
+G_DEFINE_TYPE (AmselParserRss, amsel_parser_rss, AMSEL_TYPE_PARSER_XML)
 
-G_DEFINE_TYPE_WITH_CODE (AmselParserRss, amsel_parser_rss, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (AMSEL_TYPE_PARSER,
-                                                amsel_parser_iface_init))
-
-/* enum { */
-/*   PROP_0, */
-/*   N_PROPS */
-/* }; */
-
-/* static GParamSpec *properties [N_PROPS]; */
-
-AmselParserRss *
-amsel_parser_rss_new (void)
+static void
+_channel_title (AmselParser  *parser,
+                AmselChannel *channel,
+                xmlDocPtr     doc,
+                xmlNodePtr    cur)
 {
-  return g_object_new (AMSEL_TYPE_PARSER_RSS, NULL);
+  AM_TRACE_MSG ("%s", "Parse Channel Title");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_channel_set_title (channel, str);
+  xmlFree (str);
 }
 
 static void
-amsel_parser_rss_finalize (GObject *object)
+_channel_description (AmselParser  *parser,
+                      AmselChannel *channel,
+                      xmlDocPtr     doc,
+                      xmlNodePtr    cur)
 {
-  /* AmselParserRss *self = (AmselParserRss *)object; */
-
-  G_OBJECT_CLASS (amsel_parser_rss_parent_class)->finalize (object);
+  AM_TRACE_MSG ("%s", "Parse Channel Description");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_channel_set_description (channel, str);
+  xmlFree (str);
 }
 
-/* static void */
-/* amsel_parser_rss_get_property (GObject    *object, */
-/*                                guint       prop_id, */
-/*                                GValue     *value, */
-/*                                GParamSpec *pspec) */
-/* { */
-/*   AmselParserRss *self = AMSEL_PARSER_RSS (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
-
-/* static void */
-/* amsel_parser_rss_set_property (GObject      *object, */
-/*                                guint         prop_id, */
-/*                                const GValue *value, */
-/*                                GParamSpec   *pspec) */
-/* { */
-/*   AmselParserRss *self = AMSEL_PARSER_RSS (object); */
-
-/*   switch (prop_id) */
-/*     { */
-/*     default: */
-/*       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec); */
-/*     } */
-/* } */
+static void
+_channel_link (AmselParser  *parser,
+               AmselChannel *channel,
+               xmlDocPtr     doc,
+               xmlNodePtr    cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Channel Link");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_channel_set_source (channel, str);
+  xmlFree (str);
+}
 
 static void
-amsel_parser_rss_class_init (AmselParserRssClass *klass)
+_channel_item (AmselParser  *parser,
+               AmselChannel *channel,
+               xmlDocPtr     doc,
+               xmlNodePtr    cur)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  AM_TRACE_MSG ("%s", "Parse Channel Item");
 
-  object_class->finalize = amsel_parser_rss_finalize;
-  /* object_class->get_property = amsel_parser_rss_get_property; */
-  /* object_class->set_property = amsel_parser_rss_set_property; */
+  g_autoptr (AmselEntry) item = amsel_entry_new ();
+  amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
+  amsel_channel_add_entry (channel, item);
+}
+
+static void
+_channel_image (AmselParser  *parser,
+                AmselChannel *channel,
+                xmlDocPtr     doc,
+                xmlNodePtr    cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Channel Image");
+
+  cur = cur->xmlChildrenNode;
+
+  while (cur)
+    {
+      if (!xmlStrcmp (cur->name, BAD_CAST "url"))
+        {
+          char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+          amsel_channel_set_icon (channel, str);
+          xmlFree (str);
+        }
+      cur = cur->next;
+    }
+}
+
+static void
+_item_title (AmselParser *parser,
+             AmselEntry  *entry,
+             xmlDocPtr    doc,
+             xmlNodePtr   cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Item Title");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_title (entry, str);
+  xmlFree (str);
+}
+
+static void
+_item_description (AmselParser *parser,
+                   AmselEntry  *entry,
+                   xmlDocPtr    doc,
+                   xmlNodePtr   cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Item Description");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_content (entry, str);
+  xmlFree (str);
+}
+
+static void
+_item_guid (AmselParser *parser,
+            AmselEntry  *entry,
+            xmlDocPtr    doc,
+            xmlNodePtr   cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Item GUID");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_id (entry, str);
+  xmlFree (str);
+}
+
+static void
+_item_pubDate (AmselParser *parser,
+               AmselEntry  *entry,
+               xmlDocPtr    doc,
+               xmlNodePtr   cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Item PubDate");
+  char *rfc822 = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  g_autoptr (GDateTime) pubDate = amsel_date_parser_parse_RFC822 (rfc822);
+  amsel_entry_set_updated_datetime (entry, pubDate);
+  xmlFree (rfc822);
+}
+
+static void
+_item_author (AmselParser *parser,
+              AmselEntry  *entry,
+              xmlDocPtr    doc,
+              xmlNodePtr   cur)
+{
+  AM_TRACE_MSG ("%s", "Parse Item Author");
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  amsel_entry_set_author (entry, str);
+  xmlFree (str);
 }
 
 static void
 amsel_parser_rss_init (AmselParserRss *self)
 {
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (self);
+  amsel_parser_xml_add_channel_handler (xmlparser, "title", _channel_title);
+  amsel_parser_xml_add_channel_handler (xmlparser, "description", _channel_description);
+  amsel_parser_xml_add_channel_handler (xmlparser, "link", _channel_link);
+  amsel_parser_xml_add_channel_handler (xmlparser, "item", _channel_item);
+  amsel_parser_xml_add_channel_handler (xmlparser, "image", _channel_image);
+
+  amsel_parser_xml_add_item_handler (xmlparser, "title", _item_title);
+  amsel_parser_xml_add_item_handler (xmlparser, "description", _item_description);
+  amsel_parser_xml_add_item_handler (xmlparser, "guid", _item_guid);
+  amsel_parser_xml_add_item_handler (xmlparser, "pubDate", _item_pubDate);
+  amsel_parser_xml_add_item_handler (xmlparser, "author", _item_author);
 }
-
-#define HANDLE_CHANNEL_NODE(namestr, parsefunc) \
-    (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
-      parsefunc (channel, str); \
-      xmlFree (str);\
-    }
-
-#define HANDLE_ITEM_NODE(namestr, parsefunc) \
-    (!xmlStrcmp (cur->name, BAD_CAST #namestr)) { \
-      char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);\
-      parsefunc (item, str); \
-      xmlFree (str);\
-    }
 
 static void
 amsel_parser_rss_parse_item (AmselParser *parser,
@@ -104,33 +174,13 @@ amsel_parser_rss_parse_item (AmselParser *parser,
                              xmlDocPtr    doc,
                              xmlNodePtr   cur)
 {
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (parser);
+
   while (cur)
     {
-      if HANDLE_ITEM_NODE(title, amsel_entry_set_title)
-      else if HANDLE_ITEM_NODE(description, amsel_entry_set_content)
-      else if HANDLE_ITEM_NODE(guid, amsel_entry_set_id)
-      else if (!xmlStrcmp (cur->name, BAD_CAST "pubDate"))
-        {
-          char *rfc822 = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-          g_autoptr (GDateTime) pubDate = amsel_date_parser_parse_RFC822 (rfc822);
-          amsel_entry_set_updated_datetime (item, pubDate);
-          xmlFree (rfc822);
-        }
-      else if HANDLE_ITEM_NODE(author, amsel_entry_set_author)
 
-      cur = cur->next;
-    }
-}
+      amsel_parser_xml_handle_item (xmlparser, (const char *)cur->name, item, doc, cur);
 
-static void
-amsel_parser_rss_parse_image (AmselParser  *parser,
-                              AmselChannel *channel,
-                              xmlDocPtr     doc,
-                              xmlNodePtr    cur)
-{
-  while (cur)
-    {
-      if HANDLE_CHANNEL_NODE (url, amsel_channel_set_icon)
       cur = cur->next;
     }
 }
@@ -141,6 +191,8 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
                                 xmlDocPtr     doc,
                                 xmlNodePtr    cur)
 {
+  AmselParserXml *xmlparser = AMSEL_PARSER_XML (parser);
+
   while (cur)
     {
       if (cur->type != XML_ELEMENT_NODE || cur->name == NULL) {
@@ -153,30 +205,19 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
         continue;
       }
 
-      if HANDLE_CHANNEL_NODE(title, amsel_channel_set_title)
-      else if HANDLE_CHANNEL_NODE(description, amsel_channel_set_description)
-      else if HANDLE_CHANNEL_NODE(link, amsel_channel_set_source)
-      else if (!xmlStrcmp (cur->name, BAD_CAST "item"))
-        {
-          g_autoptr (AmselEntry) item = amsel_entry_new ();
-          amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
-          amsel_channel_add_entry (channel, item);
-        }
-      else if (!xmlStrcmp (cur->name, BAD_CAST "image"))
-        {
-          amsel_parser_rss_parse_image (parser, channel, doc, cur->xmlChildrenNode);
-        }
+      amsel_parser_xml_handle_channel (xmlparser, (const char*)cur->name, channel, doc, cur);
 
       cur = cur->next;
     }
 }
 
-static void
-amsel_parser_rss_internal_parse (AmselParser *parser,
-                                 GPtrArray   *channels,
+static GPtrArray *
+amsel_parser_rss_internal_parse (AmselParserXml *xmlparser,
                                  xmlDocPtr    doc,
                                  xmlNodePtr   node)
 {
+  AmselParser *parser = AMSEL_PARSER (xmlparser);
+  GPtrArray *channels = g_ptr_array_new ();
   xmlNodePtr cur = node;
 
   if (cur && !xmlStrcmp (cur->name, BAD_CAST "rss")) {
@@ -192,29 +233,32 @@ amsel_parser_rss_internal_parse (AmselParser *parser,
       }
       cur = cur->next;
     }
-}
 
-GPtrArray *
-amsel_parser_rss_parse (AmselParser  *parser,
-                        AmselRequest *request)
-{
-  g_return_val_if_fail (AMSEL_IS_PARSER (parser), NULL);
-
-  xmlDocPtr doc;
-  GPtrArray *channels;
-
-  channels = g_ptr_array_new_with_free_func (g_object_unref);
-
-  doc = xmlParseMemory (amsel_request_get_data (request), amsel_request_get_size (request));
-
-  xmlNodePtr root = xmlDocGetRootElement (doc);
-  amsel_parser_rss_internal_parse (parser, channels, doc, root);
-  xmlFreeDoc (doc);
   return channels;
 }
 
-static void
-amsel_parser_iface_init (AmselParserInterface *iface)
+AmselParserRss *
+amsel_parser_rss_new (void)
 {
-  iface->parse = amsel_parser_rss_parse;
+  return g_object_new (AMSEL_TYPE_PARSER_RSS, NULL);
 }
+
+static void
+amsel_parser_rss_finalize (GObject *object)
+{
+  /* AmselParserRss *self = (AmselParserRss *)object; */
+
+  G_OBJECT_CLASS (amsel_parser_rss_parent_class)->finalize (object);
+}
+
+static void
+amsel_parser_rss_class_init (AmselParserRssClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  AmselParserXmlClass *xml_class = AMSEL_PARSER_XML_CLASS (klass);
+
+  object_class->finalize = amsel_parser_rss_finalize;
+
+  xml_class->parse_xml = amsel_parser_rss_internal_parse;
+}
+
