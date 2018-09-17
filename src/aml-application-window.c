@@ -169,6 +169,20 @@ aml_application_window_create_row_channel (gpointer item,
   return lbl;
 }
 
+static gint
+feedlist_sort (gconstpointer entry_a,
+               gconstpointer entry_b,
+               gpointer      user_data)
+{
+  AmselEntry *a = AMSEL_ENTRY (entry_a);
+  AmselEntry *b = AMSEL_ENTRY (entry_b);
+
+  GDateTime *datetime_a = amsel_entry_get_updated (a);
+  GDateTime *datetime_b = amsel_entry_get_updated (b);
+
+  return -g_date_time_compare (datetime_a, datetime_b);
+}
+
 static void
 aml_application_window_init (AmlApplicationWindow *self)
 {
@@ -195,7 +209,7 @@ aml_application_window_init (AmlApplicationWindow *self)
         GList *entries = g_hash_table_get_values (tbl);
         for (GList *cur = entries; cur != NULL; cur = g_list_next (cur))
           {
-            g_list_store_append (self->feedstore, cur->data);
+            g_list_store_insert_sorted (self->feedstore, cur->data, feedlist_sort, NULL);
           }
       }
   }
