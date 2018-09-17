@@ -151,7 +151,21 @@ aml_application_window_create_row_channel (gpointer item,
                                            gpointer user_data)
 {
   AmselEntry *e = AMSEL_ENTRY (item);
-  GtkWidget *lbl = gtk_label_new (amsel_entry_get_title (e));
+
+  const gchar *str = amsel_entry_get_title (e);
+  const gchar *format = "<b>\%s</b>";
+  g_autofree gchar *markup;
+
+  GtkWidget *lbl = gtk_label_new (NULL);
+  markup = g_markup_printf_escaped (format, str);
+  gtk_label_set_markup (GTK_LABEL (lbl), markup);
+  gtk_label_set_lines (GTK_LABEL (lbl), 2);
+  gtk_label_set_line_wrap (GTK_LABEL(lbl), TRUE);
+  gtk_label_set_xalign (GTK_LABEL(lbl), 0.f);
+  gtk_widget_set_margin_top (lbl, 5);
+  gtk_widget_set_margin_bottom (lbl, 5);
+  gtk_widget_set_margin_start (lbl, 5);
+  gtk_widget_set_margin_end (lbl, 5);
   return lbl;
 }
 
