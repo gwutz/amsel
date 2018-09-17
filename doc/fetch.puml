@@ -1,0 +1,13 @@
+@startuml
+skinparam shadowing false
+
+AmlApplicationWindow -> AmselEngine: get_channels
+activate AmselEngine
+AmselEngine -> AmselCache: get_channels
+activate AmselCache
+AmselCache -> AmselEngine: get_channels response
+deactivate AmselCache
+AmselEngine -> AmlApplicationWindow: get_channels response
+deactivate AmselEngine
+
+@enduml

@@ -7,3 +7,8 @@ prefix=/home/gunibert/.var/app/org.gnome.Builder/cache/gnome-builder/install/ams
 app-id=
 postbuild=
 prebuild=
+toolchain=default
+default=true
+
+[default.environment]
+G_MESSAGES_DEBUG=all

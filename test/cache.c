@@ -46,7 +46,7 @@ void
 test_add_channel_error (void)
 {
   GError *error = NULL;
-  AmselChannel *channel = amsel_channel_new ("");
+  AmselChannel *channel = amsel_channel_new ();
 
   g_autoptr (AmselDatabase) database = AMSEL_DATABASE (amsel_memory_database_new ());
   AmselCache *cache = amsel_cache_new (database);

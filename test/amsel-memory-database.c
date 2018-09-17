@@ -24,8 +24,6 @@ amsel_memory_database_new (void)
 static void
 amsel_memory_database_finalize (GObject *object)
 {
-  AmselMemoryDatabase *self = (AmselMemoryDatabase *)object;
-
   G_OBJECT_CLASS (amsel_memory_database_parent_class)->finalize (object);
 }
 

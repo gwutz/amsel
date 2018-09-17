@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnome/Amsel">
+  <gresource prefix="/org/gnome/Alb">
   <file>rss-relax-ng.xml</file>
   <file>atom-relax-ng.xml</file>
   <file>rss-schema.xsd</file>

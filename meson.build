@@ -19,14 +19,14 @@ add_project_arguments([
   '-I' + meson.build_root(),
 ], language: 'c')
 
-# pkggirdir = join_paths(get_option('datadir'),'amsel', 'gir-1.0')
-# pkgtypelibdir = join_paths(get_option('libdir'), 'amsel', 'girepository-1.0')
+package_subdir = get_option('package_subdir') # When used as subproject
+girdir = join_paths(get_option('datadir'), package_subdir, 'gir-1.0')
+typelibdir = join_paths(get_option('libdir'), package_subdir, 'girepository-1.0')
 
 subdir('data')
+subdir('lib')
 subdir('src')
-# subdir('plugins')
 subdir('test')
-# subdir('po')
-# subdir('doc')
+subdir('doc')
 
 # meson.add_install_script('build-aux/meson/postinstall.py')

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<gresources>
+  <gresource prefix="/org/gnome/Amsel">
+    <file>window.ui</file>
+    <file>addfeed.ui</file>
+  </gresource>
+</gresources>

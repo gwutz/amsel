@@ -42,7 +42,6 @@ typedef struct {
 
 void
 data_cleanup (data *d) {
-  g_print ("%s", "cleanup data");
   g_free (d);
 }
 
