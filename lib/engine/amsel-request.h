@@ -29,12 +29,14 @@ typedef struct _AmselRequest AmselRequest;
 
 GType             amsel_request_get_type         (void) G_GNUC_CONST;
 AmselRequest     *amsel_request_new              (const char       *data,
-                                                  gsize             size);
+                                                  gsize             size,
+                                                  gchar            *url);
 AmselRequest     *amsel_request_copy             (AmselRequest     *self);
 void              amsel_request_set_request_type (AmselRequest     *self,
                                                   AmselRequestType  type);
 char             *amsel_request_get_data         (AmselRequest     *self);
 gsize             amsel_request_get_size         (AmselRequest     *self);
+char             *amsel_request_get_url          (AmselRequest     *self);
 AmselRequestType  amsel_request_get_request_type (AmselRequest     *self);
 void              amsel_request_free             (AmselRequest     *self);
 

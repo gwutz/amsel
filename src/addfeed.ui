@@ -23,6 +23,7 @@
         <child>
           <object class="GtkEntry" id="url_entry">
             <property name="visible">True</property>
+            <signal name="activate" handler="aml_add_feed_dialog_activated" object="AmlAddFeedDialog" swapped="no"/>
           </object>
         </child>
         <child>
@@ -62,3 +63,4 @@
     </action-widgets>
   </template>
 </interface>
+

@@ -33,6 +33,7 @@ struct _AmselParserXmlClass
   GObjectClass parent_class;
 
   GPtrArray * (*parse_xml) (AmselParserXml *xmlparser,
+                            gchar          *url,
                             xmlDocPtr       doc,
                             xmlNodePtr      node);
 };

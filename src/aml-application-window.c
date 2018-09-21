@@ -22,6 +22,7 @@
 #include "downloader/aml-downloader.h"
 #include "aml-add-feed-dialog.h"
 #include <webkit2/webkit2.h>
+#include "alb.h"
 
 struct _AmlApplicationWindow
 {
@@ -90,7 +91,10 @@ add_feed_ready (GObject      *source_object,
   AmselEngine *engine = AMSEL_ENGINE (source_object);
   AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
 
-  GPtrArray *channels = amsel_engine_parse_finish (engine, res, &error);
+  g_autoptr (GPtrArray) channels = amsel_engine_parse_finish (engine, res, &error);
+  if (channels->len > 0) {
+    gtk_stack_set_visible_child_full (self->stack, "feedview", GTK_STACK_TRANSITION_TYPE_CROSSFADE);
+  }
 }
 
 static void
@@ -98,7 +102,7 @@ data_fetched (GObject      *source_object,
               GAsyncResult *res,
               gpointer      user_data)
 {
-  gchar *raw;
+  g_autofree gchar *raw;
   AmselRequest *request;
   AmselEngine *engine;
   AmlApplication *app;
@@ -106,7 +110,10 @@ data_fetched (GObject      *source_object,
 
   app = AML_APPLICATION (gtk_window_get_application (GTK_WINDOW (self)));
   raw = aml_downloader_fetch_finish (AML_DOWNLOADER (source_object), res, NULL);
-  request = amsel_request_new (raw, strlen (raw));
+
+  gchar *url = g_task_get_task_data (G_TASK (res));
+
+  request = amsel_request_new (raw, strlen (raw), url);
 
   if (amsel_request_get_request_type (request) == AMSEL_REQUEST_TYPE_UNDECIDED)
     {
@@ -146,6 +153,26 @@ add_feed (GSimpleAction *action,
   gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
+static void
+refresh_feeds (GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
+{
+  AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
+  AmlApplication *app = AML_APPLICATION (g_application_get_default ());
+  AmselEngine *engine = aml_application_get_engine (app);
+
+  g_autoptr(GPtrArray) channels = amsel_engine_get_channels (engine);
+
+  for (int i = 0; i < channels->len; i++)
+    {
+      AmselChannel *c = g_ptr_array_index (channels, i);
+      const gchar *url = amsel_channel_get_source (c);
+
+      aml_downloader_fetch_async (self->downloader, url, NULL, data_fetched, self);
+    }
+}
+
 static GtkWidget *
 aml_application_window_create_row_channel (gpointer item,
                                            gpointer user_data)
@@ -169,18 +196,29 @@ aml_application_window_create_row_channel (gpointer item,
   return lbl;
 }
 
-static gint
-feedlist_sort (gconstpointer entry_a,
-               gconstpointer entry_b,
-               gpointer      user_data)
+static void
+aml_application_window_new_entry_cb (AmselCache *cache,
+                                     AmselEntry *entry,
+                                     gpointer    user_data)
 {
-  AmselEntry *a = AMSEL_ENTRY (entry_a);
-  AmselEntry *b = AMSEL_ENTRY (entry_b);
+  AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
 
-  GDateTime *datetime_a = amsel_entry_get_updated (a);
-  GDateTime *datetime_b = amsel_entry_get_updated (b);
+  g_assert (AMSEL_IS_MAIN_THREAD ());
+  g_list_store_insert_sorted (self->feedstore, entry, (GCompareDataFunc) amsel_entry_sort, NULL);
+}
 
-  return -g_date_time_compare (datetime_a, datetime_b);
+static void
+aml_application_window_set_shortcuts (AmlApplicationWindow *self)
+{
+  g_return_if_fail (AML_IS_APPLICATION_WINDOW (self));
+
+  GApplication *app = g_application_get_default ();
+
+  const gchar *accel_add[] = {"<Control>a", NULL};
+  gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.add", accel_add);
+
+  const gchar *accel_refresh[] = {"<Control>r", NULL};
+  gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.refresh", accel_refresh);
 }
 
 static void
@@ -195,9 +233,10 @@ aml_application_window_init (AmlApplicationWindow *self)
   GApplication *app = g_application_get_default ();
   AmlApplication *aml = AML_APPLICATION (app);
   AmselEngine *engine = aml_application_get_engine (aml);
+  amsel_engine_connect_signal (engine, G_CALLBACK (aml_application_window_new_entry_cb), self);
   self->downloader = aml_downloader_new ();
 
-  GPtrArray *channels = amsel_engine_get_channels (engine);
+  g_autoptr(GPtrArray) channels = amsel_engine_get_channels (engine);
   if (channels->len == 0) {
     gtk_stack_set_visible_child_name (self->stack, "empty");
   } else {
@@ -209,17 +248,20 @@ aml_application_window_init (AmlApplicationWindow *self)
         GList *entries = g_hash_table_get_values (tbl);
         for (GList *cur = entries; cur != NULL; cur = g_list_next (cur))
           {
-            g_list_store_insert_sorted (self->feedstore, cur->data, feedlist_sort, NULL);
+            g_list_store_insert_sorted (self->feedstore, cur->data, (GCompareDataFunc) amsel_entry_sort, NULL);
           }
+        g_list_free (entries);
       }
   }
 
   const GActionEntry win_entries[] = {
       { "add", add_feed },
+      { "refresh", refresh_feeds },
   };
 
   g_action_map_add_action_entries (G_ACTION_MAP (self),
                                    win_entries,
                                    G_N_ELEMENTS (win_entries),
                                    self);
+  aml_application_window_set_shortcuts (self);
 }

@@ -51,7 +51,6 @@ _channel_link (AmselParser  *parser,
 {
   AM_TRACE_MSG ("%s", "Parse Channel Link");
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
-  amsel_channel_set_source (channel, str);
   amsel_channel_set_id (channel, str);
   xmlFree (str);
 }
@@ -64,8 +63,12 @@ _channel_item (AmselParser  *parser,
 {
   AM_TRACE_MSG ("%s", "Parse Channel Item");
 
-  g_autoptr (AmselEntry) item = amsel_entry_new ();
+  AmselEntry *item = amsel_entry_new ();
   amsel_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
+  if (amsel_entry_get_updated (item) == NULL) {
+    g_autoptr(GDateTime) now = g_date_time_new_now_local ();
+    amsel_entry_set_updated_datetime (item, now);
+  }
   amsel_channel_add_entry (channel, item);
 }
 
@@ -214,8 +217,9 @@ amsel_parser_rss_parse_channel (AmselParser  *parser,
 
 static GPtrArray *
 amsel_parser_rss_internal_parse (AmselParserXml *xmlparser,
-                                 xmlDocPtr    doc,
-                                 xmlNodePtr   node)
+                                 gchar          *url,
+                                 xmlDocPtr       doc,
+                                 xmlNodePtr      node)
 {
   AmselParser *parser = AMSEL_PARSER (xmlparser);
   GPtrArray *channels = g_ptr_array_new ();
@@ -229,6 +233,7 @@ amsel_parser_rss_internal_parse (AmselParserXml *xmlparser,
     {
       if (!xmlStrcmp (cur->name, BAD_CAST "channel")) {
         AmselChannel *channel = amsel_channel_new ();
+        amsel_channel_set_source (channel, url);
         amsel_parser_rss_parse_channel (parser, channel, doc, cur->xmlChildrenNode);
         g_ptr_array_add (channels, channel);
       }

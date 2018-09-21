@@ -31,7 +31,6 @@ G_BEGIN_DECLS
 #define AMSEL_TYPE_ENTRY (amsel_entry_get_type())
 
 G_DECLARE_FINAL_TYPE (AmselEntry, amsel_entry, AMSEL, ENTRY, GObject)
-
 AmselEntry  *amsel_entry_new                  (void);
 void         amsel_entry_set_id               (AmselEntry  *self,
                                                const gchar *id);
@@ -53,12 +52,14 @@ const gchar *amsel_entry_get_link             (AmselEntry  *self);
 void         amsel_entry_set_author           (AmselEntry  *self,
                                                const gchar *author);
 const gchar *amsel_entry_get_author           (AmselEntry  *self);
-
 void         amsel_entry_set_preview_image    (AmselEntry  *self,
                                                const gchar *preview_image);
 const gchar *amsel_entry_get_preview_image    (AmselEntry  *self);
 void         amsel_entry_set_read             (AmselEntry  *self,
                                                gboolean     read);
 gboolean     amsel_entry_get_read             (AmselEntry  *self);
+gint         amsel_entry_sort                 (AmselEntry *self,
+                                               AmselEntry *other,
+                                               gpointer    user_data);
 
 G_END_DECLS

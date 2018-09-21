@@ -306,7 +306,7 @@ amsel_channel_add_entry (AmselChannel *self,
   g_return_if_fail (AMSEL_IS_CHANNEL (self));
   g_return_if_fail (AMSEL_IS_ENTRY (entry));
 
-  g_hash_table_insert (self->entries, (char *)amsel_entry_get_id (entry), g_object_ref(entry));
+  g_hash_table_insert (self->entries, (char *)amsel_entry_get_id (entry), entry);
 }
 
 /**

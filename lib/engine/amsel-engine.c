@@ -17,6 +17,8 @@
  *
  */
 
+static GThread *main_thread;
+
 struct _AmselEngine
 {
   GObject parent_instance;
@@ -52,15 +54,15 @@ amsel_engine_class_init (AmselEngineClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = amsel_engine_finalize;
-  /* object_class->get_property = amsel_engine_get_property; */
-  /* object_class->set_property = amsel_engine_set_property; */
+
+  main_thread = g_thread_self ();
 }
 
 static void
 amsel_engine_init (AmselEngine *self)
 {
-  self->validators = g_list_append (self->validators, amsel_validator_rss_new ());
-  self->validators = g_list_append (self->validators, amsel_validator_atom_new ());
+  /* self->validators = g_list_append (self->validators, amsel_validator_rss_new ()); */
+  /* self->validators = g_list_append (self->validators, amsel_validator_atom_new ()); */
 
   self->parsers = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, g_object_unref);
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (AMSEL_REQUEST_TYPE_RSS), amsel_parser_rss_new ());
@@ -107,9 +109,7 @@ amsel_engine_parse_worker (GTask        *task,
 {
   AmselEngine *self = AMSEL_ENGINE (source_object);
   AmselRequest *request = (AmselRequest *) task_data;
-  GPtrArray *channels;
   GPtrArray *ret = g_ptr_array_new_with_free_func (NULL);
-  GError *error = NULL;
 
   AmselParser *parser = g_hash_table_lookup (self->parsers, GINT_TO_POINTER (amsel_request_get_request_type (request)));
   if (parser == NULL) {
@@ -117,19 +117,8 @@ amsel_engine_parse_worker (GTask        *task,
     return;
   }
 
-  channels = amsel_parser_parse (AMSEL_PARSER (parser), request);
-  for (int i = 0; i < channels->len; i++)
-    {
-      AmselChannel *channel = g_ptr_array_index (channels, i);
-      AmselChannel *c = amsel_cache_add_channel (self->cache, channel, &error);
-      if (error != NULL) {
-        g_warning ("%s", error->message);
-        continue;
-      }
-      g_ptr_array_add (ret, c);
-    }
+  ret = amsel_parser_parse (AMSEL_PARSER (parser), request);
 
-  g_ptr_array_unref (channels);
   g_task_return_pointer (task, ret, (GDestroyNotify) g_ptr_array_unref);
 }
 
@@ -197,10 +186,29 @@ amsel_engine_parse_finish (AmselEngine *self,
                            GAsyncResult *result,
                            GError **error)
 {
-  g_return_val_if_fail (AMSEL_IS_ENGINE (self), FALSE);
-  g_return_val_if_fail (G_IS_TASK (result), FALSE);
+  g_return_val_if_fail (AMSEL_IS_ENGINE (self), NULL);
+  g_return_val_if_fail (G_IS_TASK (result), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  GPtrArray *ret = g_ptr_array_new_with_free_func (NULL);
+  GPtrArray *channels = g_task_propagate_pointer (G_TASK (result), error);
+
+  if (*error != NULL) {
+    return NULL;
+  }
+
+  for (int i = 0; i < channels->len; i++)
+    {
+      AmselChannel *channel = g_ptr_array_index (channels, i);
+      AmselChannel *c = amsel_cache_add_channel (self->cache, channel, error);
+      if (*error != NULL) {
+        g_warning ("%s", (*error)->message);
+        continue;
+      }
+      g_ptr_array_add (ret, c);
+    }
+
+  g_ptr_array_unref (channels);
+  return ret;
 }
 
 /**
@@ -216,4 +224,18 @@ amsel_engine_get_channels (AmselEngine  *self)
   g_return_val_if_fail (AMSEL_IS_ENGINE (self), NULL);
 
   return amsel_cache_get_channels (self->cache);
+}
+
+void
+amsel_engine_connect_signal (AmselEngine *self,
+                             GCallback    callback,
+                             gpointer     user_data)
+{
+  g_signal_connect (self->cache, "new-entry", callback, user_data);
+}
+
+GThread *
+amsel_engine_get_main_thread (void)
+{
+  return main_thread;
 }

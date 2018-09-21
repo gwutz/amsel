@@ -12,7 +12,7 @@ test_feed (AmselEngineFixture *fixture, SoupMessage *msg)
   GPtrArray *channels;
   AmselRequest *request;
 
-  request = amsel_request_new (msg->response_body->data, strlen (msg->response_body->data));
+  request = amsel_request_new (msg->response_body->data, strlen (msg->response_body->data), soup_message_get_uri (msg)->path);
   channels = amsel_engine_parse (fixture->engine, request);
   g_assert_nonnull (channels);
   g_assert_cmpint (channels->len, >, 0);

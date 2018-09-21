@@ -248,7 +248,7 @@ amsel_sqlite_database_get_entries_for_channel (AmselSqliteDatabase *self,
   while (sqlite3_step (stmt) != SQLITE_DONE)
     {
       int columns = sqlite3_column_count (stmt);
-      g_autoptr (AmselEntry) entry = amsel_entry_new ();
+      AmselEntry* entry = amsel_entry_new ();
 
       for (int i = 0; i < columns; i++)
         {

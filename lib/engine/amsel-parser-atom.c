@@ -59,7 +59,7 @@ _channel_entry (AmselParser  *parser,
                 xmlDocPtr     doc,
                 xmlNodePtr    cur)
 {
-  g_autoptr (AmselEntry) item = amsel_entry_new ();
+  AmselEntry *item = amsel_entry_new ();
   amsel_parser_atom_parse_item (parser, item, doc, cur->xmlChildrenNode);
   amsel_channel_add_entry (channel, item);
 }
@@ -159,8 +159,9 @@ amsel_parser_atom_parse_channel (AmselParser  *parser,
 
 static GPtrArray *
 amsel_parser_atom_internal_parse (AmselParserXml *xmlparser,
-                                  xmlDocPtr    doc,
-                                  xmlNodePtr   node)
+                                  gchar          *url,
+                                  xmlDocPtr       doc,
+                                  xmlNodePtr      node)
 {
   AmselParser *parser = AMSEL_PARSER (xmlparser);
   GPtrArray *channels = g_ptr_array_new ();

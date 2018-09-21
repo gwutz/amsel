@@ -57,7 +57,7 @@ amsel_parser_xml_parse (AmselParser  *parser,
 
   xmlNodePtr root = xmlDocGetRootElement (doc);
 
-  channels = AMSEL_PARSER_XML_GET_CLASS (self)->parse_xml (self, doc, root);
+  channels = AMSEL_PARSER_XML_GET_CLASS (self)->parse_xml (self, amsel_request_get_url (request), doc, root);
 
   xmlFreeDoc (doc);
 

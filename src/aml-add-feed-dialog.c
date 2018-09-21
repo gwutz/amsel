@@ -54,6 +54,16 @@ aml_add_feed_dialog_finalize (GObject *object)
 }
 
 static void
+aml_add_feed_dialog_activated (GtkEntry *entry,
+                               gpointer  user_data)
+{
+  g_return_if_fail (AML_IS_ADD_FEED_DIALOG (user_data));
+
+  GtkDialog *dialog = GTK_DIALOG (user_data);
+  gtk_dialog_response (dialog, GTK_RESPONSE_OK);
+}
+
+static void
 aml_add_feed_dialog_class_init (AmlAddFeedDialogClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -64,6 +74,7 @@ aml_add_feed_dialog_class_init (AmlAddFeedDialogClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/Amsel/addfeed.ui");
   gtk_widget_class_bind_template_child (widget_class, AmlAddFeedDialog, url_entry);
   gtk_widget_class_bind_template_child (widget_class, AmlAddFeedDialog, validation);
+  gtk_widget_class_bind_template_callback (widget_class, aml_add_feed_dialog_activated);
 }
 
 static void
@@ -71,7 +82,7 @@ aml_add_feed_dialog_validate (GtkEditable *editable,
                               gpointer  user_data)
 {
   AmlAddFeedDialog *self = AML_ADD_FEED_DIALOG (user_data);
-  SoupURI *uri;
+  g_autoptr (SoupURI) uri;
 
   uri = soup_uri_new (gtk_entry_get_text (GTK_ENTRY (editable)));
   if (uri == NULL)

@@ -25,6 +25,13 @@ struct _AmselCache
 
 G_DEFINE_TYPE (AmselCache, amsel_cache, G_TYPE_OBJECT)
 
+enum {
+  NEW_ENTRY,
+  LAST_SIGNAL
+};
+
+static guint signals [LAST_SIGNAL] = {0};
+
 enum
 {
   PROP_0,
@@ -116,6 +123,18 @@ amsel_cache_class_init (AmselCacheClass *klass)
   object_class->get_property = amsel_cache_get_property;
   object_class->set_property = amsel_cache_set_property;
 
+  signals [NEW_ENTRY] =
+    g_signal_new ("new-entry",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL,
+                  NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
+                  G_TYPE_NONE,
+                  1,
+                  AMSEL_TYPE_ENTRY);
+
   properties [PROP_DATABASE] =
     g_param_spec_object ("database",
                          "Database",
@@ -173,6 +192,7 @@ amsel_cache_merge_entry (AmselCache   *self,
   if (!found) {
     g_hash_table_insert (entries, (char *)id, g_object_ref (entry));
     amsel_database_save_entry (self->database, channel, entry, NULL);
+    g_signal_emit (self, signals[NEW_ENTRY], 0, entry);
   }
 
   return found;
@@ -244,12 +264,24 @@ amsel_cache_add_channel (AmselCache    *self,
       g_hash_table_insert (self->channels,
                            (char *) key,
                            g_object_ref(channel));
+
+      // announce the new entries to possible listener
+      GHashTableIter iter;
+      gpointer key, value;
+      GHashTable *entries = amsel_channel_get_entries (channel);
+      g_hash_table_iter_init (&iter, entries);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_signal_emit (self, signals[NEW_ENTRY], 0, value);
+        }
+
       return channel;
     }
   else
     {
       amsel_cache_merge_channels (self, existingChannel, channel);
 
+      g_object_unref (channel);
       return existingChannel;
     }
 }

@@ -22,7 +22,7 @@ test_validate_rss (void)
       g_autofree char *file = g_build_filename (SRCDIR, "/test/testdata_rss/", name, NULL);
       g_file_get_contents (file, &xml, &length, &error);
       g_debug ("Process testfile: %s", file);
-      AmselRequest *data = amsel_request_new (xml, length);
+      AmselRequest *data = amsel_request_new (xml, length, NULL);
       g_free (xml);
 
       gboolean validate = amsel_engine_validate (engine, data);
@@ -56,7 +56,7 @@ test_validate_atom (void)
       g_autofree char *file = g_build_filename (SRCDIR, "/test/testdata_atom/", name, NULL);
       g_debug ("Process testfile: %s", file);
       g_file_get_contents (file, &xml, &length, &error);
-      AmselRequest *data = amsel_request_new (xml, length);
+      AmselRequest *data = amsel_request_new (xml, length, NULL);
       g_free (xml);
 
       gboolean validate = amsel_engine_validate (engine, data);
@@ -83,7 +83,7 @@ test_parse_rss (void)
 
   g_file_get_contents (SRCDIR"/test/testdata_rss/parse.xml", &xml, &length, &error);
 
-  request = amsel_request_new (xml, strlen (xml));
+  request = amsel_request_new (xml, strlen (xml), NULL);
   g_free (xml);
 
   engine = amsel_engine_new ();
@@ -142,7 +142,7 @@ test_parse_atom (void)
 
   g_file_get_contents (SRCDIR"/test/testdata_atom/parse.xml", &xml, &length, &error);
 
-  request = amsel_request_new (xml, strlen (xml));
+  request = amsel_request_new (xml, strlen (xml), NULL);
 
   engine = amsel_engine_new ();
   channels = amsel_engine_parse (engine, request);

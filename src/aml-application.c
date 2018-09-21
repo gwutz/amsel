@@ -42,6 +42,10 @@ aml_application_new (void)
 static void
 aml_application_finalize (GObject *object)
 {
+  AmlApplication *self = AML_APPLICATION (object);
+
+  g_clear_object (&self->engine);
+
   G_OBJECT_CLASS (aml_application_parent_class)->finalize (object);
 }
 

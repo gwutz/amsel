@@ -15,14 +15,14 @@ test_add_items (void)
   GError *error = NULL;
 
   g_file_get_contents (SRCDIR"/test/testdata_cache/pl_gnome1.xml", &xml, &length, &error);
-  AmselRequest *request = amsel_request_new (xml, length);
+  AmselRequest *request = amsel_request_new (xml, length, NULL);
   g_free (xml);
 
   GPtrArray *channels = amsel_engine_parse (engine, request);
   amsel_request_free (request);
 
   g_file_get_contents (SRCDIR"/test/testdata_cache/pl_gnome2.xml", &xml, &length, &error);
-  request = amsel_request_new (xml, length);
+  request = amsel_request_new (xml, length, NULL);
   g_free (xml);
 
   g_ptr_array_unref (channels);

@@ -20,6 +20,7 @@
 #define G_LOG_DOMAIN "amsel-entry"
 
 #include "amsel-entry.h"
+#include "amsel-debug.h"
 
 /**
  * SECTION:amsel-entry
@@ -80,6 +81,8 @@ amsel_entry_finalize (GObject *object)
   g_clear_pointer (&self->link, g_free);
   g_clear_pointer (&self->preview_image, g_free);
   g_clear_pointer (&self->author, g_free);
+
+  AM_TRACE_MSG ("%s", "Finalize Entry");
 
   G_OBJECT_CLASS (amsel_entry_parent_class)->finalize (object);
 }
@@ -395,4 +398,15 @@ amsel_entry_get_author (AmselEntry *self)
   g_return_val_if_fail (AMSEL_IS_ENTRY (self), NULL);
 
   return self->author;
+}
+
+gint
+amsel_entry_sort (AmselEntry *self,
+                  AmselEntry *other,
+                  gpointer    user_data)
+{
+  GDateTime *datetime_a = amsel_entry_get_updated (self);
+  GDateTime *datetime_b = amsel_entry_get_updated (other);
+
+  return -g_date_time_compare (datetime_a, datetime_b);
 }

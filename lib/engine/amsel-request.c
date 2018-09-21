@@ -1,4 +1,5 @@
 #include "amsel-request.h"
+#include "amsel-debug.h"
 #include <stdlib.h>
 
 G_DEFINE_BOXED_TYPE (AmselRequest, amsel_request, amsel_request_copy, amsel_request_free)
@@ -18,6 +19,8 @@ struct _AmselRequest {
   AmselRequestType type;
   char *data;
   gsize size;
+
+  gchar *url;
 };
 
 /* internal methods */
@@ -35,12 +38,14 @@ static AmselRequestType determine_type (const char *data,
  */
 AmselRequest *
 amsel_request_new (const char *data,
-                   gsize       size)
+                   gsize       size,
+                   gchar      *url)
 {
   AmselRequest *request = malloc (sizeof (AmselRequest));
   request->type = determine_type (data, size);
   request->data = g_strdup (data);
   request->size = size;
+  request->url = g_strdup (url);
   return request;
 }
 
@@ -60,7 +65,7 @@ amsel_request_copy (AmselRequest *self)
 
   g_return_val_if_fail (self, NULL);
 
-  copy = amsel_request_new (self->data, self->size);
+  copy = amsel_request_new (self->data, self->size, self->url);
 
   return copy;
 }
@@ -97,7 +102,9 @@ determine_type (const char *data,
 void
 amsel_request_free (AmselRequest *self)
 {
+  AM_TRACE_MSG ("Free request");
   free (self->data);
+  free (self->url);
   free (self);
 }
 
@@ -127,6 +134,20 @@ gsize
 amsel_request_get_size (AmselRequest *self)
 {
   return self->size;
+}
+
+/**
+ * amsel_request_get_url:
+ * @self: a #AmselRequest
+ *
+ * getter for the url of the wrapped data
+ *
+ * Returns: the url where we fetched this request
+ */
+char *
+amsel_request_get_url (AmselRequest *self)
+{
+  return self->url;
 }
 
 /**
