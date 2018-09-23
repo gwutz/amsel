@@ -16,6 +16,7 @@ configure_file(
   configuration: config_h,
 )
 add_project_arguments([
+  '-Werror=implicit-function-declaration',
   '-I' + meson.build_root(),
 ], language: 'c')
 

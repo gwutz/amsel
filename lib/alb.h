@@ -2,13 +2,16 @@
 
 #define __ALB_H_INSIDE__
 
-#include "amsel-cache.h"
-#include "amsel-database.h"
-#include "amsel-sqlite-database.h"
-#include "amsel-engine.h"
-#include "amsel-parser.h"
-#include "amsel-request.h"
-#include "amsel-validator.h"
-#include "amsel-date-parser.h"
+#include "alb-cache.h"
+#include "alb-database.h"
+#include "alb-sqlite-database.h"
+#include "alb-engine.h"
+#include "alb-parser.h"
+#include "alb-request.h"
+#include "alb-validator.h"
+#include "alb-date-parser.h"
+
+#include "alb-entry.h"
+#include "alb-channel.h"
 
 #undef  __ALB_H_INSIDE__

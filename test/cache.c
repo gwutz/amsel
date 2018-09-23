@@ -9,34 +9,34 @@
 static void
 test_add_items (void)
 {
-  g_autoptr (AmselEngine) engine = amsel_engine_new ();
+  g_autoptr (AlbEngine) engine = alb_engine_new ();
   char *xml;
   gsize length;
   GError *error = NULL;
 
   g_file_get_contents (SRCDIR"/test/testdata_cache/pl_gnome1.xml", &xml, &length, &error);
-  AmselRequest *request = amsel_request_new (xml, length, NULL);
+  AlbRequest *request = alb_request_new (xml, length, NULL);
   g_free (xml);
 
-  GPtrArray *channels = amsel_engine_parse (engine, request);
-  amsel_request_free (request);
+  GPtrArray *channels = alb_engine_parse (engine, request);
+  alb_request_free (request);
 
   g_file_get_contents (SRCDIR"/test/testdata_cache/pl_gnome2.xml", &xml, &length, &error);
-  request = amsel_request_new (xml, length, NULL);
+  request = alb_request_new (xml, length, NULL);
   g_free (xml);
 
   g_ptr_array_unref (channels);
-  channels = amsel_engine_parse (engine, request);
-  amsel_request_free (request);
+  channels = alb_engine_parse (engine, request);
+  alb_request_free (request);
 
   g_assert_cmpint (channels->len, ==, 1);
-  GHashTable *entries = amsel_channel_get_entries (g_ptr_array_index (channels, 0));
+  GHashTable *entries = alb_channel_get_entries (g_ptr_array_index (channels, 0));
 
   g_assert_cmpint (g_hash_table_size (entries), ==, 42);
   g_ptr_array_unref (channels);
 
   /** test persistence of channel */
-  channels = amsel_engine_get_channels (engine);
+  channels = alb_engine_get_channels (engine);
   g_assert_nonnull (channels);
   g_assert_cmpint (channels->len, ==, 1);
   g_ptr_array_unref (channels);
@@ -46,13 +46,13 @@ void
 test_add_channel_error (void)
 {
   GError *error = NULL;
-  AmselChannel *channel = amsel_channel_new ();
+  AlbChannel *channel = alb_channel_new ();
 
-  g_autoptr (AmselDatabase) database = AMSEL_DATABASE (amsel_memory_database_new ());
-  AmselCache *cache = amsel_cache_new (database);
-  amsel_cache_add_channel (cache, channel, &error);
+  g_autoptr (AlbDatabase) database = ALB_DATABASE (amsel_memory_database_new ());
+  AlbCache *cache = alb_cache_new (database);
+  alb_cache_add_channel (cache, channel, &error);
   g_object_unref (channel);
-  g_assert_error (error, AMSEL_CACHE_ERROR, AMSEL_CACHE_ERROR_NO_SOURCE);
+  g_assert_error (error, ALB_CACHE_ERROR, ALB_CACHE_ERROR_NO_ID);
   g_clear_error (&error);
   g_object_unref (cache);
 }

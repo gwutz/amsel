@@ -31,13 +31,6 @@ struct _AmlAddFeedDialog
 
 G_DEFINE_TYPE (AmlAddFeedDialog, aml_add_feed_dialog, GTK_TYPE_DIALOG)
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
-static GParamSpec *properties [N_PROPS];
-
 AmlAddFeedDialog *
 aml_add_feed_dialog_new (GtkWindow *parent)
 {

@@ -1,9 +1,3 @@
-gnome = import('gnome')
-
-aml_resource = gnome.compile_resources('aml-resources',
-  'aml.gresource.xml',
-  c_name: 'aml'
-)
 aml_sources = [
   'main.c',
   'aml-application.c',

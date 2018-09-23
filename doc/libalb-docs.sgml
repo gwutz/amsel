@@ -8,23 +8,23 @@
   <title>Alb reference manual</title>
   <part id="alb-engine">
     <title>Amsel Engine</title>
-    <xi:include href="xml/amsel-engine.xml"/>
-    <xi:include href="xml/amsel-channel.xml"/>
-    <xi:include href="xml/amsel-entry.xml"/>
-    <xi:include href="xml/amsel-cache.xml"/>
+    <xi:include href="xml/alb-engine.xml"/>
+    <xi:include href="xml/alb-channel.xml"/>
+    <xi:include href="xml/alb-entry.xml"/>
+    <xi:include href="xml/alb-cache.xml"/>
   </part>
   <part id="alb-internals">
     <title>Amsel Engine Internals</title>
-    <xi:include href="xml/amsel-parser.xml"/>
-    <xi:include href="xml/amsel-parser-xml.xml"/>
-    <xi:include href="xml/amsel-parser-atom.xml"/>
-    <xi:include href="xml/amsel-parser-rss.xml"/>
-    <xi:include href="xml/amsel-request.xml"/>
-    <xi:include href="xml/amsel-database.xml"/>
+    <xi:include href="xml/alb-parser.xml"/>
+    <xi:include href="xml/alb-parser-xml.xml"/>
+    <xi:include href="xml/alb-parser-atom.xml"/>
+    <xi:include href="xml/alb-parser-rss.xml"/>
+    <xi:include href="xml/alb-request.xml"/>
+    <xi:include href="xml/alb-database.xml"/>
   </part>
   <part id="alb-extra">
     <title>Amsel Engine Extras</title>
-    <!-- <xi:include href="xml/amsel-opml.xml"/> -->
+    <!-- <xi:include href="xml/alb-opml.xml"/> -->
   </part>
 
   <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>

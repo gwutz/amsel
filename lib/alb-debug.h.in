@@ -1,0 +1,44 @@
+/* amsel-debug.h.in
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#include <glib.h>
+
+G_BEGIN_DECLS
+
+#ifndef AMSEL_ENABLE_TRACING
+#  define AMSEL_ENABLE_TRACING @AMSEL_ENABLE_TRACING@
+#endif
+#if AMSEL_ENABLE_TRACING != 1
+#  undef AMSEL_ENABLE_TRACING
+#endif
+
+#ifndef AM_LOG_LEVEL_TRACE
+#define AM_LOG_LEVEL_TRACE ((GLogLevelFlags)(1 << G_LOG_LEVEL_USER_SHIFT))
+#endif
+
+#if AMSEL_ENABLE_TRACING
+#define AM_TRACE_MSG(fmt, ...) \
+	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "MSG: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
+#define AM_ENTRY \
+	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "ENTRY: %s():%d", G_STRFUNC, __LINE__)
+#else
+#define AM_TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
+#define AM_ENTRY               G_STMT_START { } G_STMT_END
+#endif

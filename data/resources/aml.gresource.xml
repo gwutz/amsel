@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<gresources>
+  <gresource prefix="/org/gnome/Amsel">
+    <file alias="window.ui" compressed="true" preprocess="xml-stripblanks">ui/window.ui</file>
+    <file alias="addfeed.ui" compressed="true" preprocess="xml-stripblanks">ui/addfeed.ui</file>
+    <file alias="entry.ui" compressed="true" preprocess="xml-stripblanks">ui/entry.ui</file>
+    <file alias="gears_menu.ui" compressed="true" preprocess="xml-stripblanks">ui/gears_menu.ui</file>
+    <file alias="shortcuts.ui" compressed="true" preprocess="xml-stripblanks">ui/shortcuts.ui</file>
+  </gresource>
+</gresources>

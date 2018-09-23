@@ -30,6 +30,6 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (AmlApplication, aml_application, AML, APPLICATION, GtkApplication)
 
 AmlApplication *aml_application_new (void);
-AmselEngine    *aml_application_get_engine (AmlApplication *self);
+AlbEngine    *aml_application_get_engine (AmlApplication *self);
 
 G_END_DECLS

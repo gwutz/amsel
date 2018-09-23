@@ -1,12 +1,12 @@
 gnome = import('gnome')
 pkg = import('pkgconfig')
 
-amsel_conf = configuration_data()
-amsel_conf.set10('AMSEL_ENABLE_TRACING', get_option('enable_tracing'))
-amsel_debug_h = configure_file(
-  input: 'amsel-debug.h.in',
-  output: 'amsel-debug.h',
-  configuration: amsel_conf,
+alb_conf = configuration_data()
+alb_conf.set10('AMSEL_ENABLE_TRACING', get_option('enable_tracing'))
+alb_debug_h = configure_file(
+  input: 'alb-debug.h.in',
+  output: 'alb-debug.h',
+  configuration: alb_conf,
 )
 
 inc = include_directories(
@@ -19,38 +19,38 @@ inc = include_directories(
 amsel_public_headers = [
   'alb.h',
 
-  'engine/amsel-engine.h',
-  'engine/amsel-request.h',
-  'engine/amsel-validator.h',
-  'engine/amsel-parser.h',
-  'engine/amsel-cache.h',
-  'engine/amsel-database.h',
-  'engine/amsel-sqlite-database.h',
-  'model/amsel-channel.h',
-  'model/amsel-entry.h',
-  'opml/amsel-opml.h',
+  'engine/alb-engine.h',
+  'engine/alb-request.h',
+  'engine/alb-validator.h',
+  'engine/alb-parser.h',
+  'engine/alb-cache.h',
+  'engine/alb-database.h',
+  'engine/alb-sqlite-database.h',
+  'model/alb-channel.h',
+  'model/alb-entry.h',
+  'opml/alb-opml.h',
 ]
 
 install_headers(amsel_public_headers, subdir: 'alb')
 
 amsel_sources = [
-  'engine/amsel-engine.c',
-  'engine/amsel-request.c',
-  'engine/amsel-validator.c',
-  'engine/amsel-validator-rss.c',
-  'engine/amsel-validator-atom.c',
-  'engine/amsel-parser.c',
-  'engine/amsel-parser-xml.c',
-  'engine/amsel-parser-rss.c',
-  'engine/amsel-parser-atom.c',
-  'engine/amsel-cache.c',
-  'engine/amsel-database.c',
-  'engine/amsel-sqlite-database.c',
-  'model/amsel-channel.c',
-  'model/amsel-entry.c',
-  'utils/amsel-date-parser.c',
-  'utils/amsel-sqlite-helper.c',
-  'opml/amsel-opml.c',
+  'engine/alb-engine.c',
+  'engine/alb-request.c',
+  'engine/alb-validator.c',
+  'engine/alb-validator-rss.c',
+  'engine/alb-validator-atom.c',
+  'engine/alb-parser.c',
+  'engine/alb-parser-xml.c',
+  'engine/alb-parser-rss.c',
+  'engine/alb-parser-atom.c',
+  'engine/alb-cache.c',
+  'engine/alb-database.c',
+  'engine/alb-sqlite-database.c',
+  'model/alb-channel.c',
+  'model/alb-entry.c',
+  'utils/alb-date-parser.c',
+  'utils/alb-sqlite-helper.c',
+  'opml/alb-opml.c',
 ]
 
 amsel_dependencies = [
@@ -87,8 +87,8 @@ gnome.generate_gir(alb_lib,
   nsversion: '1.0',
   dependencies: [amsel_dependencies],
   namespace: 'Alb',
-  symbol_prefix: 'amsel',
-  identifier_prefix: 'Amsel',
+  symbol_prefix: 'alb',
+  identifier_prefix: 'Alb',
   includes: [ 'GLib-2.0', 'Gio-2.0' ],
   install: true,
   install_dir_gir: girdir,

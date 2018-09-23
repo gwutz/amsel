@@ -3,31 +3,31 @@
 #include "alb.h"
 
 typedef struct {
-  AmselEngine *engine;
-} AmselEngineFixture;
+  AlbEngine *engine;
+} AlbEngineFixture;
 
 static void
-test_feed (AmselEngineFixture *fixture, SoupMessage *msg)
+test_feed (AlbEngineFixture *fixture, SoupMessage *msg)
 {
   GPtrArray *channels;
-  AmselRequest *request;
+  AlbRequest *request;
 
-  request = amsel_request_new (msg->response_body->data, strlen (msg->response_body->data), soup_message_get_uri (msg)->path);
-  channels = amsel_engine_parse (fixture->engine, request);
+  request = alb_request_new (msg->response_body->data, strlen (msg->response_body->data), soup_message_get_uri (msg)->path);
+  channels = alb_engine_parse (fixture->engine, request);
   g_assert_nonnull (channels);
   g_assert_cmpint (channels->len, >, 0);
-  amsel_request_free (request);
+  alb_request_free (request);
 }
 
 static void
-stresstest_setup (AmselEngineFixture *fixture,
+stresstest_setup (AlbEngineFixture *fixture,
                   gconstpointer       user_data)
 {
-  fixture->engine = amsel_engine_new ();
+  fixture->engine = alb_engine_new ();
 }
 
 static void
-stresstest_feeds (AmselEngineFixture *fixture,
+stresstest_feeds (AlbEngineFixture *fixture,
                   gconstpointer       user_data)
 {
   SoupSession *session = soup_session_new ();
@@ -53,7 +53,7 @@ stresstest_feeds (AmselEngineFixture *fixture,
 }
 
 static void
-stresstest_teardown (AmselEngineFixture *fixture,
+stresstest_teardown (AlbEngineFixture *fixture,
                      gconstpointer       user_data)
 {
   g_object_unref (fixture->engine);
@@ -66,7 +66,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   if (g_test_slow ())
-    g_test_add ("/stresstest/feeds", AmselEngineFixture, NULL, stresstest_setup, stresstest_feeds, stresstest_teardown);
+    g_test_add ("/stresstest/feeds", AlbEngineFixture, NULL, stresstest_setup, stresstest_feeds, stresstest_teardown);
 
   return g_test_run ();
 }

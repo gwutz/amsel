@@ -11,7 +11,7 @@ test_parse_rfc822 (void)
   for (int i = 0; i < testdates->len; i++) {
     char *td = g_ptr_array_index (testdates, i);
 
-    GDateTime *parsedDate = amsel_date_parser_parse_RFC822 (td);
+    GDateTime *parsedDate = alb_date_parser_parse_RFC822 (td);
 
     g_assert_nonnull (parsedDate);
     g_assert_cmpint (2, ==, g_date_time_get_day_of_month (parsedDate));

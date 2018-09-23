@@ -25,7 +25,7 @@ struct _AmlApplication
 {
   GtkApplication parent_instance;
 
-  AmselEngine *engine;
+  AlbEngine *engine;
 };
 
 G_DEFINE_TYPE (AmlApplication, aml_application, GTK_TYPE_APPLICATION)
@@ -79,10 +79,10 @@ aml_application_class_init (AmlApplicationClass *klass)
 static void
 aml_application_init (AmlApplication *self)
 {
-  self->engine = amsel_engine_new ();
+  self->engine = alb_engine_new ();
 }
 
-AmselEngine *
+AlbEngine *
 aml_application_get_engine (AmlApplication *self)
 {
   g_return_val_if_fail (AML_IS_APPLICATION (self), NULL);
