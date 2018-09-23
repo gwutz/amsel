@@ -14,11 +14,13 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (AmselCache, amsel_cache, AMSEL, CACHE, GObject)
 
-AmselCache   *amsel_cache_new          (AmselDatabase *database);
-AmselChannel *amsel_cache_add_channel  (AmselCache    *self,
-                                        AmselChannel  *channel,
-                                        GError       **error);
-GPtrArray    *amsel_cache_get_channels (AmselCache   *self);
+AmselCache   *amsel_cache_new          (AmselDatabase  *database);
+AmselChannel *amsel_cache_add_channel  (AmselCache     *self,
+                                        AmselChannel   *channel,
+                                        GError        **error);
+GPtrArray    *amsel_cache_get_channels (AmselCache     *self);
+void          amsel_cache_mark_read    (AmselCache     *self,
+                                        AmselEntry     *entry);
 
 #define AMSEL_CACHE_ERROR amsel_cache_error_quark ()
 

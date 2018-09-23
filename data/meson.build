@@ -1,3 +1,12 @@
+desktop_file = i18n.merge_file(
+  input: 'org.gnome.Amsel.desktop.in',
+  output: 'org.gnome.Amsel.desktop',
+  type: 'desktop',
+  po_dir: '../po',
+  install: true,
+  install_dir: join_paths(get_option('datadir'), 'applications')
+)
+
 subdir ('resources')
 
 # desktop_file = i18n.merge_file(

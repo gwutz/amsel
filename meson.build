@@ -2,7 +2,7 @@ project('alb', 'c',        version: '0.1.0',
   meson_version: '>= 0.42.0',
 )
 
-# i18n = import('i18n')
+i18n = import('i18n')
 
 config_h = configuration_data()
 config_h.set_quoted('GETTEXT_PACKAGE', 'amsel')
@@ -28,5 +28,4 @@ subdir('lib')
 subdir('src')
 subdir('test')
 subdir('doc')
-
-# meson.add_install_script('build-aux/meson/postinstall.py')
+subdir('build-aux')

@@ -30,6 +30,9 @@ struct _AmselDatabaseInterface
                                        AmselChannel   *channel,
                                        AmselEntry     *entry,
                                        GError        **error);
+  void       (*set_read)              (AmselDatabase  *self,
+                                       AmselEntry     *entry,
+                                       GError        **error);
   GPtrArray *(*get_channels)          (AmselDatabase *self);
 };
 
@@ -38,6 +41,9 @@ void       amsel_database_save_channel (AmselDatabase  *self,
                                         GError        **error);
 void       amsel_database_save_entry   (AmselDatabase  *self,
                                         AmselChannel   *channel,
+                                        AmselEntry     *entry,
+                                        GError        **error);
+void       amsel_database_set_read     (AmselDatabase  *self,
                                         AmselEntry     *entry,
                                         GError        **error);
 GPtrArray *amsel_database_get_channels (AmselDatabase  *self);

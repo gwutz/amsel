@@ -23,6 +23,7 @@
 #include "aml-add-feed-dialog.h"
 #include <webkit2/webkit2.h>
 #include "alb.h"
+#include "amsel-debug.h"
 
 struct _AmlApplicationWindow
 {
@@ -34,6 +35,7 @@ struct _AmlApplicationWindow
   GtkListBox *feedlist;
   GListStore *feedstore;
   WebKitWebView *entryview;
+  GtkMenuButton *gears;
 };
 
 G_DEFINE_TYPE (AmlApplicationWindow, aml_application_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -49,6 +51,11 @@ aml_application_window_new (AmlApplication *application)
 static void
 aml_application_window_finalize (GObject *object)
 {
+  AM_TRACE_MSG ("Finalize Application Window");
+  AmlApplicationWindow *self = AML_APPLICATION_WINDOW (object);
+
+  g_clear_object (&self->downloader);
+
   G_OBJECT_CLASS (aml_application_window_parent_class)->finalize (object);
 }
 
@@ -58,11 +65,15 @@ aml_application_window_entry_activated (GtkListBox    *box,
                                         gpointer       user_data)
 {
   AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
+  AmlApplication *app = AML_APPLICATION (g_application_get_default ());
+  AmselEngine *engine = aml_application_get_engine (app);
   AmselEntry *entry;
 
   gint index = gtk_list_box_row_get_index (row);
   entry = g_list_model_get_item (G_LIST_MODEL (self->feedstore), index);
 
+  amsel_entry_set_read (entry, TRUE);
+  amsel_engine_mark_entry_read (engine, entry);
   const gchar *content = amsel_entry_get_content (entry);
   webkit_web_view_load_html (self->entryview, content, NULL);
 }
@@ -79,6 +90,7 @@ aml_application_window_class_init (AmlApplicationWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, AmlApplicationWindow, stack);
   gtk_widget_class_bind_template_child (widget_class, AmlApplicationWindow, feedlist);
   gtk_widget_class_bind_template_child (widget_class, AmlApplicationWindow, entryview);
+  gtk_widget_class_bind_template_child (widget_class, AmlApplicationWindow, gears);
   gtk_widget_class_bind_template_callback (widget_class, aml_application_window_entry_activated);
 }
 
@@ -173,27 +185,51 @@ refresh_feeds (GSimpleAction *action,
     }
 }
 
+static void
+show_about (GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
+{
+  AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
+  const gchar *authors[] = {"Günther Wagner", NULL};
+
+  gtk_show_about_dialog (GTK_WINDOW (self),
+                         "title", "About Amsel",
+                         "authors", authors,
+                         "license-type", GTK_LICENSE_GPL_3_0,
+                         "logo-icon-name", "org.gnome.Amsel",
+                         "copyright", "© 2018 Günther Wagner, et al.",
+                         NULL);
+}
+
 static GtkWidget *
 aml_application_window_create_row_channel (gpointer item,
                                            gpointer user_data)
 {
   AmselEntry *e = AMSEL_ENTRY (item);
 
+  g_autoptr(GtkBuilder) builder = gtk_builder_new_from_resource ("/org/gnome/Amsel/entry.ui");
+  GtkWidget *row = GTK_WIDGET (gtk_builder_get_object (builder, "row"));
+  GtkWidget *lbl_title = GTK_WIDGET (gtk_builder_get_object (builder, "lbl_title"));
+  GtkWidget *lbl_author = GTK_WIDGET (gtk_builder_get_object (builder, "lbl_author"));
+
   const gchar *str = amsel_entry_get_title (e);
-  const gchar *format = "<b>\%s</b>";
+  const gchar *format;
+  if (amsel_entry_get_read (e))
+    format = "%s";
+  else
+    format = "<b>\%s</b>";
   g_autofree gchar *markup;
 
-  GtkWidget *lbl = gtk_label_new (NULL);
   markup = g_markup_printf_escaped (format, str);
-  gtk_label_set_markup (GTK_LABEL (lbl), markup);
-  gtk_label_set_lines (GTK_LABEL (lbl), 2);
-  gtk_label_set_line_wrap (GTK_LABEL(lbl), TRUE);
-  gtk_label_set_xalign (GTK_LABEL(lbl), 0.f);
-  gtk_widget_set_margin_top (lbl, 5);
-  gtk_widget_set_margin_bottom (lbl, 5);
-  gtk_widget_set_margin_start (lbl, 5);
-  gtk_widget_set_margin_end (lbl, 5);
-  return lbl;
+  gtk_label_set_markup (GTK_LABEL (lbl_title), markup);
+  const gchar *author = amsel_entry_get_author (e);
+  if (author != NULL)
+    gtk_label_set_text (GTK_LABEL (lbl_author), author);
+  else
+    gtk_widget_hide (lbl_author);
+
+  return g_object_ref (row);
 }
 
 static void
@@ -213,12 +249,28 @@ aml_application_window_set_shortcuts (AmlApplicationWindow *self)
   g_return_if_fail (AML_IS_APPLICATION_WINDOW (self));
 
   GApplication *app = g_application_get_default ();
+  g_autoptr(GtkBuilder) builder;
 
   const gchar *accel_add[] = {"<Control>a", NULL};
   gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.add", accel_add);
 
   const gchar *accel_refresh[] = {"<Control>r", NULL};
   gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.refresh", accel_refresh);
+
+  const gchar *accel_shortcuts[] = {"<Control><Shift>question", NULL};
+  gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.show-help-overlay", accel_shortcuts);
+
+  builder = gtk_builder_new_from_resource ("/org/gnome/Amsel/shortcuts.ui");
+  GtkShortcutsWindow *shortcuts_window = GTK_SHORTCUTS_WINDOW (gtk_builder_get_object (builder, "shortcuts"));
+  gtk_application_window_set_help_overlay (GTK_APPLICATION_WINDOW (self), shortcuts_window);
+}
+
+static void
+aml_application_window_set_gears_menu (AmlApplicationWindow *self)
+{
+  g_autoptr(GtkBuilder) builder = gtk_builder_new_from_resource ("/org/gnome/Amsel/gears_menu.ui");
+  GMenuModel *menu = G_MENU_MODEL (gtk_builder_get_object (builder, "gears-menu"));
+  gtk_menu_button_set_menu_model (self->gears, menu);
 }
 
 static void
@@ -257,6 +309,7 @@ aml_application_window_init (AmlApplicationWindow *self)
   const GActionEntry win_entries[] = {
       { "add", add_feed },
       { "refresh", refresh_feeds },
+      { "about", show_about },
   };
 
   g_action_map_add_action_entries (G_ACTION_MAP (self),
@@ -264,4 +317,5 @@ aml_application_window_init (AmlApplicationWindow *self)
                                    G_N_ELEMENTS (win_entries),
                                    self);
   aml_application_window_set_shortcuts (self);
+  aml_application_window_set_gears_menu (self);
 }

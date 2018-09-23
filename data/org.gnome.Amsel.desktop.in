@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Amsel
+Comment=Revive RSS feeds
+Exec=amsel
+Icon=org.gnome.Amsel
+Terminal=false
+Type=Application

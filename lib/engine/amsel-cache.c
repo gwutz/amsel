@@ -309,3 +309,14 @@ amsel_cache_get_channels (AmselCache *self)
 
   return ret;
 }
+
+void
+amsel_cache_mark_read (AmselCache *self,
+                       AmselEntry *entry)
+{
+  g_return_if_fail (AMSEL_IS_CACHE (self));
+
+  AM_TRACE_MSG ("mark '%s' as read", amsel_entry_get_title (entry));
+
+  amsel_database_set_read (self->database, entry, NULL);
+}

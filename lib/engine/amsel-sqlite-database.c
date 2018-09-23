@@ -206,6 +206,27 @@ amsel_sqlite_database_save_entry (AmselDatabase  *db,
 }
 
 static void
+amsel_sqlite_database_set_read (AmselDatabase  *db,
+                                AmselEntry     *entry,
+                                GError        **error)
+{
+  g_return_if_fail (AMSEL_IS_DATABASE (db));
+
+  AmselSqliteDatabase *self = AMSEL_SQLITE_DATABASE (db);
+  gint rc;
+  g_autoptr(sqlite3_stmt) stmt;
+
+  rc = sqlite3_prepare_v2 (self->db, "UPDATE entries SET read=? WHERE id=?", -1, &stmt, NULL);
+  if (rc != SQLITE_OK)
+    g_error ("%s", sqlite3_errmsg (self->db));
+
+  sqlite3_bind_int (stmt, 1, amsel_entry_get_read (entry));
+  sqlite3_bind_text (stmt, 2, amsel_entry_get_id (entry), -1, NULL);
+
+  sqlite3_step (stmt);
+}
+
+static void
 amsel_sqlite_database_save_channel (AmselDatabase  *db,
                                     AmselChannel   *channel,
                                     GError        **error)
@@ -265,6 +286,10 @@ amsel_sqlite_database_get_entries_for_channel (AmselSqliteDatabase *self,
           }
           else if (g_strcmp0 (column_name, "link") == 0)
             amsel_entry_set_link (entry, (const char *) sqlite3_column_text (stmt, i));
+          else if (g_strcmp0 (column_name, "read") == 0)
+            amsel_entry_set_read (entry, sqlite3_column_int (stmt, i));
+          else if (g_strcmp0 (column_name, "author") == 0)
+            amsel_entry_set_author (entry, (const char *) sqlite3_column_text (stmt, i));
         }
 
       amsel_channel_add_entry (channel, entry);
@@ -311,4 +336,5 @@ amsel_sqlite_database_db_interface_init (AmselDatabaseInterface *iface)
   iface->save_channel = amsel_sqlite_database_save_channel;
   iface->save_entry = amsel_sqlite_database_save_entry;
   iface->get_channels = amsel_sqlite_database_get_channels;
+  iface->set_read = amsel_sqlite_database_set_read;
 }

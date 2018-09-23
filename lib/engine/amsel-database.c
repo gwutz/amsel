@@ -39,6 +39,15 @@ amsel_database_save_entry (AmselDatabase  *self,
   AMSEL_DATABASE_GET_IFACE (self)->save_entry (self, channel, entry, error);
 }
 
+void
+amsel_database_set_read (AmselDatabase  *self,
+                         AmselEntry     *entry,
+                         GError        **error)
+{
+  AMSEL_DATABASE_GET_IFACE (self)->set_read (self, entry, error);
+}
+
+
 GQuark
 amsel_database_error_quark ()
 {

@@ -7,6 +7,7 @@
 #include <glib-object.h>
 #include <gio/gio.h>
 #include "amsel-request.h"
+#include "amsel-entry.h"
 
 G_BEGIN_DECLS
 
@@ -29,6 +30,8 @@ GPtrArray   *amsel_engine_parse_finish    (AmselEngine          *self,
                                            GAsyncResult         *result,
                                            GError              **error);
 GPtrArray   *amsel_engine_get_channels    (AmselEngine          *self);
+void         amsel_engine_mark_entry_read (AmselEngine          *self,
+                                           AmselEntry           *entry);
 void         amsel_engine_connect_signal  (AmselEngine          *self,
                                            GCallback             callback,
                                            gpointer              user_data);

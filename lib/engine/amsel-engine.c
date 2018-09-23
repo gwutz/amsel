@@ -239,3 +239,13 @@ amsel_engine_get_main_thread (void)
 {
   return main_thread;
 }
+
+void
+amsel_engine_mark_entry_read (AmselEngine *self,
+                              AmselEntry  *entry)
+{
+  g_return_if_fail (AMSEL_IS_ENGINE (self));
+  g_return_if_fail (AMSEL_IS_ENTRY (entry));
+
+  amsel_cache_mark_read (self->cache, entry);
+}
