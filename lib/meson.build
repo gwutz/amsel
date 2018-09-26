@@ -2,7 +2,7 @@ gnome = import('gnome')
 pkg = import('pkgconfig')
 
 alb_conf = configuration_data()
-alb_conf.set10('AMSEL_ENABLE_TRACING', get_option('enable_tracing'))
+alb_conf.set10('ALB_ENABLE_TRACING', get_option('enable_tracing'))
 alb_debug_h = configure_file(
   input: 'alb-debug.h.in',
   output: 'alb-debug.h',
@@ -14,6 +14,7 @@ inc = include_directories(
   'engine',
   'model',
   'utils',
+  'logging',
 )
 
 amsel_public_headers = [
@@ -29,6 +30,7 @@ amsel_public_headers = [
   'model/alb-channel.h',
   'model/alb-entry.h',
   'opml/alb-opml.h',
+  'logging/alb-log.h',
 ]
 
 install_headers(amsel_public_headers, subdir: 'alb')
@@ -51,6 +53,7 @@ amsel_sources = [
   'utils/alb-date-parser.c',
   'utils/alb-sqlite-helper.c',
   'opml/alb-opml.c',
+  'logging/alb-log.c',
 ]
 
 amsel_dependencies = [

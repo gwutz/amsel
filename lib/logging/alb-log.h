@@ -1,4 +1,4 @@
-/* alb-validator-atom.h
+/* alb-log.h
  *
  * Copyright 2018 Günther Wagner <info@gunibert.de>
  *
@@ -20,18 +20,10 @@
 
 #pragma once
 
-#if !defined (__ALB_H_INSIDE__) && !defined (ALB_COMPILATION)
-#error "Only <alb.h> could be included directly"
-#endif
-
-#include <glib-object.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
 
-#define ALB_TYPE_VALIDATOR_ATOM (alb_validator_atom_get_type())
-
-G_DECLARE_FINAL_TYPE (AlbValidatorAtom, alb_validator_atom, ALB, VALIDATOR_ATOM, GObject)
-
-AlbValidatorAtom *alb_validator_atom_new (void);
+void alb_log_init (void);
 
 G_END_DECLS

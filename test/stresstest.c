@@ -23,7 +23,7 @@ static void
 stresstest_setup (AlbEngineFixture *fixture,
                   gconstpointer       user_data)
 {
-  fixture->engine = alb_engine_new ();
+  fixture->engine = alb_engine_new ("amsel.db");
 }
 
 static void

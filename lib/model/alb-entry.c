@@ -1,23 +1,24 @@
-/* amsel-entry.c
+/* alb-entry.c
  *
- * Copyright 2018 Guenther Wagner <info@gunibert.de>
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-#define G_LOG_DOMAIN "amsel-entry"
+
+#define G_LOG_DOMAIN "alb-entry"
 
 #include "alb-entry.h"
 #include "alb-debug.h"
@@ -82,7 +83,7 @@ alb_entry_finalize (GObject *object)
   g_clear_pointer (&self->preview_image, g_free);
   g_clear_pointer (&self->author, g_free);
 
-  AM_TRACE_MSG ("%s", "Finalize Entry");
+  ALB_TRACE_MSG ("%s", "Finalize Entry");
 
   G_OBJECT_CLASS (alb_entry_parent_class)->finalize (object);
 }

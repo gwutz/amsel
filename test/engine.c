@@ -12,7 +12,7 @@ test_validate_rss (void)
   char *xml;
   g_autoptr (AlbEngine) engine;
 
-  engine = alb_engine_new ();
+  engine = alb_engine_new ("amsel.db");
 
   while ((name = g_dir_read_name (testdatadir)))
     {
@@ -46,7 +46,7 @@ test_validate_atom (void)
   char *xml;
   g_autoptr (AlbEngine) engine;
 
-  engine = alb_engine_new ();
+  engine = alb_engine_new ("amsel.db");
 
   while ((name = g_dir_read_name (testdatadir)))
     {
@@ -86,7 +86,7 @@ test_parse_rss (void)
   request = alb_request_new (xml, strlen (xml), NULL);
   g_free (xml);
 
-  engine = alb_engine_new ();
+  engine = alb_engine_new ("amsel.db");
   channels = alb_engine_parse (engine, request);
 
   alb_request_free (request);
@@ -144,7 +144,7 @@ test_parse_atom (void)
 
   request = alb_request_new (xml, strlen (xml), NULL);
 
-  engine = alb_engine_new ();
+  engine = alb_engine_new ("amsel.db");
   channels = alb_engine_parse (engine, request);
 
   alb_request_free (request);

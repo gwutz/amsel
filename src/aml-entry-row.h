@@ -1,4 +1,4 @@
-/* main.c
+/* aml-entry-row.h
  *
  * Copyright 2018 Günther Wagner <info@gunibert.de>
  *
@@ -18,23 +18,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#define G_LOG_DOMAIN "main"
+#pragma once
 
-#include <glib.h>
-#include "aml-application.h"
-#include "alb.h"
+#include <gtk/gtk.h>
+#include <alb.h>
 
-gint
-main (gint   argc,
-      gchar *argv[])
-{
-  g_autoptr(AmlApplication) app;
-  g_set_prgname ("amsel");
-  g_set_application_name ("Amsel");
+G_BEGIN_DECLS
 
-  alb_log_init ();
+#define AML_TYPE_ENTRY_ROW (aml_entry_row_get_type())
 
-  app = aml_application_new ();
+G_DECLARE_FINAL_TYPE (AmlEntryRow, aml_entry_row, AML, ENTRY_ROW, GtkListBoxRow)
 
-  return g_application_run (G_APPLICATION (app), argc, argv);
-}
+GtkWidget *aml_entry_row_new (void);
+void aml_entry_row_set_entry (AmlEntryRow *self,
+                              AlbEntry    *entry);
+
+G_END_DECLS

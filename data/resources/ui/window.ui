@@ -125,6 +125,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">add a new feed</property>
             <property name="action_name">win.add</property>
             <child>
               <object class="GtkImage">
@@ -140,6 +141,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">refresh feeds</property>
             <property name="action_name">win.refresh</property>
             <child>
               <object class="GtkImage">
@@ -158,6 +160,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">show application menu</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>

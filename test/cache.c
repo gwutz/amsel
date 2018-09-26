@@ -9,7 +9,7 @@
 static void
 test_add_items (void)
 {
-  g_autoptr (AlbEngine) engine = alb_engine_new ();
+  g_autoptr (AlbEngine) engine = alb_engine_new ("amsel.db");
   char *xml;
   gsize length;
   GError *error = NULL;

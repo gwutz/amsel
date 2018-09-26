@@ -18,6 +18,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#define G_LOG_DOMAIN "aml-add-feed-dialog"
+
 #include "aml-add-feed-dialog.h"
 #include <libsoup/soup.h>
 

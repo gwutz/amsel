@@ -18,8 +18,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#define G_LOG_DOMAIN "aml-downloader"
+
 #include "aml-downloader.h"
 #include <libsoup/soup.h>
+#include "alb-debug.h"
 
 struct _AmlDownloader
 {
@@ -38,6 +41,11 @@ aml_downloader_new (void)
 static void
 aml_downloader_finalize (GObject *object)
 {
+  ALB_ENTER;
+  AmlDownloader *self = AML_DOWNLOADER (object);
+
+  g_clear_object (&self->session);
+
   G_OBJECT_CLASS (aml_downloader_parent_class)->finalize (object);
 }
 
@@ -60,13 +68,16 @@ aml_downloader_fetch (AmlDownloader *self,
                       gchar         *url)
 {
   g_autoptr(SoupMessage) msg = NULL;
+  gchar *data = NULL;
 
   g_return_val_if_fail (AML_IS_DOWNLOADER (self), NULL);
 
   msg = soup_message_new ("GET", url);
   soup_session_send_message (self->session, msg);
 
-  return g_strdup (msg->response_body->data);
+  data = g_strdup (msg->response_body->data);
+
+  return data;
 }
 
 static void

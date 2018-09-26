@@ -1,3 +1,25 @@
+/* alb-engine.c
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "alb-engine"
+
 #include "alb-engine.h"
 #include "alb-validator.h"
 // TODO: why do we implement this here? Should be agnostic!
@@ -28,27 +50,89 @@ struct _AlbEngine
   GList *validators;
   GHashTable *parsers;
 
+  gchar *db_path;
   AlbCache *cache;
 };
 
 G_DEFINE_TYPE (AlbEngine, alb_engine, G_TYPE_OBJECT)
 
+enum {
+  PROP_0,
+  PROP_DB_PATH,
+  N_PROPS,
+};
+
+static GParamSpec *properties[N_PROPS];
+
 AlbEngine *
-alb_engine_new (void)
+alb_engine_new (gchar *db_path)
 {
-  return g_object_new (ALB_TYPE_ENGINE, NULL);
+  return g_object_new (ALB_TYPE_ENGINE,
+                       "db-path", db_path,
+                       NULL);
+}
+
+static void
+alb_engine_constructed (GObject *object)
+{
+  AlbEngine *self = ALB_ENGINE (object);
+
+  ALB_TRACE_MSG ("Database Path is: %s", self->db_path);
+  g_autoptr (AlbDatabase) database = ALB_DATABASE (alb_sqlite_database_new (self->db_path));
+  self->cache = alb_cache_new (g_steal_pointer (&database));
+
+  G_OBJECT_CLASS (alb_engine_parent_class)->constructed (object);
 }
 
 static void
 alb_engine_finalize (GObject *object)
 {
+  ALB_ENTER;
   AlbEngine *self = (AlbEngine *)object;
 
   g_list_free_full (self->validators, g_object_unref);
   g_clear_object (&self->cache);
+  g_clear_pointer (&self->db_path, g_free);
   g_hash_table_unref (self->parsers);
 
   G_OBJECT_CLASS (alb_engine_parent_class)->finalize (object);
+}
+
+static void
+alb_engine_get_property (GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
+                         GParamSpec *pspec)
+{
+  AlbEngine *self = ALB_ENGINE (object);
+
+  switch (prop_id)
+    {
+      case PROP_DB_PATH:
+        g_value_set_string (value, self->db_path);
+        break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+alb_engine_set_property (GObject      *object,
+                         guint         prop_id,
+                         const GValue *value,
+                         GParamSpec   *pspec)
+{
+  AlbEngine *self = ALB_ENGINE (object);
+
+  switch (prop_id)
+    {
+      case PROP_DB_PATH:
+        g_clear_pointer (&self->db_path, g_free);
+        self->db_path = g_value_dup_string (value);
+        break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -57,6 +141,20 @@ alb_engine_class_init (AlbEngineClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = alb_engine_finalize;
+  object_class->constructed = alb_engine_constructed;
+  object_class->get_property = alb_engine_get_property;
+  object_class->set_property = alb_engine_set_property;
+
+  properties [PROP_DB_PATH] =
+    g_param_spec_string ("db-path",
+                         "DbPath",
+                         "DbPath",
+                         "",
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT |
+                          G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (object_class, PROP_DB_PATH,
+                                   properties [PROP_DB_PATH]);
 
   main_thread = g_thread_self ();
 }
@@ -70,14 +168,11 @@ alb_engine_init (AlbEngine *self)
   self->parsers = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, g_object_unref);
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (ALB_REQUEST_TYPE_RSS), alb_parser_rss_new ());
   g_hash_table_insert (self->parsers, GINT_TO_POINTER (ALB_REQUEST_TYPE_ATOM), alb_parser_atom_new ());
-
-  g_autoptr (AlbDatabase) database = ALB_DATABASE (alb_sqlite_database_new ("amsel.db"));
-  self->cache = alb_cache_new (g_steal_pointer (&database));
 }
 
 gboolean
 alb_engine_validate (AlbEngine  *self,
-                       AlbRequest *request)
+                     AlbRequest *request)
 {
   g_return_val_if_fail (ALB_IS_ENGINE (self), FALSE);
   g_return_val_if_fail (request != NULL, FALSE);
@@ -106,17 +201,17 @@ alb_engine_validate (AlbEngine  *self,
 
 static void
 alb_engine_parse_worker (GTask        *task,
-                           gpointer      source_object,
-                           gpointer      task_data,
-                           GCancellable *cancellable)
+                         gpointer      source_object,
+                         gpointer      task_data,
+                         GCancellable *cancellable)
 {
   AlbEngine *self = ALB_ENGINE (source_object);
   AlbRequest *request = (AlbRequest *) task_data;
-  GPtrArray *ret = g_ptr_array_new_with_free_func (NULL);
+  GPtrArray *ret = NULL;
 
   AlbParser *parser = g_hash_table_lookup (self->parsers, GINT_TO_POINTER (alb_request_get_request_type (request)));
   if (parser == NULL) {
-    g_task_return_boolean (task, FALSE);
+    g_task_return_pointer (task, NULL, NULL);
     return;
   }
 
@@ -135,7 +230,7 @@ alb_engine_parse_worker (GTask        *task,
  */
 GPtrArray *
 alb_engine_parse (AlbEngine  *self,
-                    AlbRequest *request)
+                  AlbRequest *request)
 {
   g_autoptr(GTask) task = NULL;
 
@@ -176,11 +271,11 @@ alb_engine_parse (AlbEngine  *self,
  *
  */
 void
-alb_engine_parse_async (AlbEngine         *self,
-                          AlbRequest        *request,
-                          GCancellable        *cancellable,
-                          GAsyncReadyCallback  callback,
-                          gpointer             user_data)
+alb_engine_parse_async (AlbEngine           *self,
+                        AlbRequest          *request,
+                        GCancellable        *cancellable,
+                        GAsyncReadyCallback  callback,
+                        gpointer             user_data)
 {
   g_autoptr(GTask) task = NULL;
 
@@ -200,12 +295,12 @@ alb_engine_parse_async (AlbEngine         *self,
  * @result: a #GAsyncResult provided to callback
  * @error: a location for a #GError, or %NULL
  *
- * Returns:
+ * Returns: (element-type AlbChannel) (transfer full): array of #AlbChannel s
  */
 GPtrArray *
-alb_engine_parse_finish (AlbEngine *self,
-                           GAsyncResult *result,
-                           GError **error)
+alb_engine_parse_finish (AlbEngine     *self,
+                         GAsyncResult  *result,
+                         GError       **error)
 {
   g_return_val_if_fail (ALB_IS_ENGINE (self), NULL);
   g_return_val_if_fail (G_IS_TASK (result), NULL);
@@ -248,10 +343,17 @@ alb_engine_get_channels (AlbEngine  *self)
   return alb_cache_get_channels (self->cache);
 }
 
+/**
+ * alb_engine_connect_signal:
+ * @self: a #AlbEngine
+ * @callback: (scope async): a #GCallback
+ * @user_data: user data for callback
+ *
+ */
 void
 alb_engine_connect_signal (AlbEngine *self,
-                             GCallback    callback,
-                             gpointer     user_data)
+                           GCallback  callback,
+                           gpointer   user_data)
 {
   g_signal_connect (self->cache, "new-entry", callback, user_data);
 }
@@ -264,7 +366,7 @@ alb_engine_get_main_thread (void)
 
 void
 alb_engine_mark_entry_read (AlbEngine *self,
-                              AlbEntry  *entry)
+                            AlbEntry  *entry)
 {
   g_return_if_fail (ALB_IS_ENGINE (self));
   g_return_if_fail (ALB_IS_ENTRY (entry));

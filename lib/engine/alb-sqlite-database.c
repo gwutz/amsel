@@ -1,4 +1,25 @@
-#define G_LOG_DOMAIN "amsel-sqlite-database"
+/* alb-sqlite-database.c
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "alb-sqlite-database"
+
 #include "alb-sqlite-database.h"
 #include "alb-database.h"
 #include "alb-sqlite-helper.h"
@@ -34,7 +55,8 @@ AlbSqliteDatabase *
 alb_sqlite_database_new (char *filename)
 {
   sqlite3 *db;
-  g_print ("Current Dir: %s\n", g_get_current_dir ());
+  g_autofree gchar *current_dir = g_get_current_dir ();
+  ALB_TRACE_MSG ("Current Dir: %s\n", current_dir);
   int rc = sqlite3_open (filename, &db);
   if (rc != SQLITE_OK)
     g_error ("%s", sqlite3_errmsg (db));
@@ -50,7 +72,7 @@ alb_sqlite_database_finalize (GObject *object)
 {
   AlbSqliteDatabase *self = (AlbSqliteDatabase *)object;
 
-  AM_TRACE_MSG ("Finalize SQLITE DB...");
+  ALB_TRACE_MSG ("Finalize SQLITE DB...");
   int rc = sqlite3_close (self->db);
   if (rc != SQLITE_OK)
     g_error ("%s", sqlite3_errmsg (self->db));
@@ -233,7 +255,7 @@ alb_sqlite_database_save_channel (AlbDatabase  *db,
 {
   g_return_if_fail (ALB_IS_DATABASE (db));
 
-  AM_TRACE_MSG ("Save channel with id %s", alb_channel_get_id (channel));
+  ALB_TRACE_MSG ("Save channel with id %s", alb_channel_get_id (channel));
 
   AlbSqliteDatabase *self = ALB_SQLITE_DATABASE (db);
 
@@ -258,7 +280,7 @@ alb_sqlite_database_get_entries_for_channel (AlbSqliteDatabase *self,
   g_return_if_fail (ALB_IS_SQLITE_DATABASE (self));
   g_return_if_fail (ALB_IS_CHANNEL (channel));
 
-  AM_ENTRY;
+  ALB_ENTER;
 
   g_autoptr (sqlite3_stmt) stmt = NULL;
   sqlite3_prepare_v2 (self->db,

@@ -1,3 +1,25 @@
+/* alb-cache.c
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "alb-cache"
+
 #include "alb-cache.h"
 #include "alb-debug.h"
 
@@ -52,7 +74,7 @@ alb_cache_constructed (GObject *object)
 {
   AlbCache *self = ALB_CACHE (object);
 
-  GPtrArray *channels = alb_database_get_channels (self->database);
+  g_autoptr(GPtrArray) channels = alb_database_get_channels (self->database);
   for (int i = 0; i < channels->len; i++)
     {
       AlbChannel *c = ALB_CHANNEL (g_ptr_array_index (channels, i));
@@ -68,7 +90,7 @@ alb_cache_finalize (GObject *object)
 {
   AlbCache *self = (AlbCache *)object;
 
-  AM_TRACE_MSG ("Finalize Cache...");
+  ALB_TRACE_MSG ("Finalize Cache...");
 
   g_hash_table_unref (self->channels);
   g_clear_object (&self->database);
@@ -239,7 +261,7 @@ alb_cache_add_channel (AlbCache    *self,
 {
   g_return_val_if_fail (ALB_IS_CACHE (self), channel);
 
-  AM_TRACE_MSG ("%s", "Adding channel via Cache");
+  ALB_TRACE_MSG ("%s", "Adding channel via Cache");
 
   GError *db_error = NULL;
   AlbChannel *existingChannel = NULL;
@@ -316,7 +338,7 @@ alb_cache_mark_read (AlbCache *self,
 {
   g_return_if_fail (ALB_IS_CACHE (self));
 
-  AM_TRACE_MSG ("mark '%s' as read", alb_entry_get_title (entry));
+  ALB_TRACE_MSG ("mark '%s' as read", alb_entry_get_title (entry));
 
   alb_database_set_read (self->database, entry, NULL);
 }

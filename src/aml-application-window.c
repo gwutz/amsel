@@ -18,9 +18,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#define G_LOG_DOMAIN "aml-application-window"
+
 #include "aml-application-window.h"
 #include "downloader/aml-downloader.h"
 #include "aml-add-feed-dialog.h"
+#include "aml-entry-row.h"
 #include <webkit2/webkit2.h>
 #include "alb.h"
 #include "alb-debug.h"
@@ -51,7 +54,7 @@ aml_application_window_new (AmlApplication *application)
 static void
 aml_application_window_finalize (GObject *object)
 {
-  AM_TRACE_MSG ("Finalize Application Window");
+  ALB_TRACE_MSG ("Finalize Application Window");
   AmlApplicationWindow *self = AML_APPLICATION_WINDOW (object);
 
   g_clear_object (&self->downloader);
@@ -74,6 +77,11 @@ aml_application_window_entry_activated (GtkListBox    *box,
 
   alb_entry_set_read (entry, TRUE);
   alb_engine_mark_entry_read (engine, entry);
+  if (AML_IS_ENTRY_ROW (row))
+    {
+      aml_entry_row_set_entry (AML_ENTRY_ROW (row), entry);
+    }
+
   const gchar *content = alb_entry_get_content (entry);
   webkit_web_view_load_html (self->entryview, content, NULL);
 }
@@ -119,11 +127,10 @@ data_fetched (GObject      *source_object,
   AlbEngine *engine;
   AmlApplication *app;
   AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
+  gchar *url = g_task_get_task_data (G_TASK (res));
 
   app = AML_APPLICATION (gtk_window_get_application (GTK_WINDOW (self)));
   raw = aml_downloader_fetch_finish (AML_DOWNLOADER (source_object), res, NULL);
-
-  gchar *url = g_task_get_task_data (G_TASK (res));
 
   request = alb_request_new (raw, strlen (raw), url);
 
@@ -208,28 +215,10 @@ aml_application_window_create_row_channel (gpointer item,
 {
   AlbEntry *e = ALB_ENTRY (item);
 
-  g_autoptr(GtkBuilder) builder = gtk_builder_new_from_resource ("/org/gnome/Amsel/entry.ui");
-  GtkWidget *row = GTK_WIDGET (gtk_builder_get_object (builder, "row"));
-  GtkWidget *lbl_title = GTK_WIDGET (gtk_builder_get_object (builder, "lbl_title"));
-  GtkWidget *lbl_author = GTK_WIDGET (gtk_builder_get_object (builder, "lbl_author"));
+  GtkWidget *row = aml_entry_row_new ();
+  aml_entry_row_set_entry (AML_ENTRY_ROW (row), e);
 
-  const gchar *str = alb_entry_get_title (e);
-  const gchar *format;
-  if (alb_entry_get_read (e))
-    format = "%s";
-  else
-    format = "<b>\%s</b>";
-  g_autofree gchar *markup;
-
-  markup = g_markup_printf_escaped (format, str);
-  gtk_label_set_markup (GTK_LABEL (lbl_title), markup);
-  const gchar *author = alb_entry_get_author (e);
-  if (author != NULL)
-    gtk_label_set_text (GTK_LABEL (lbl_author), author);
-  else
-    gtk_widget_hide (lbl_author);
-
-  return g_object_ref (row);
+  return row;
 }
 
 static void
@@ -281,6 +270,10 @@ aml_application_window_init (AmlApplicationWindow *self)
 
   self->feedstore = g_list_store_new (ALB_TYPE_ENTRY);
   gtk_list_box_bind_model (self->feedlist, G_LIST_MODEL (self->feedstore), aml_application_window_create_row_channel, self, NULL);
+
+  WebKitSettings* settings = webkit_web_view_get_settings (self->entryview);
+  webkit_settings_set_enable_javascript (settings, FALSE);
+  webkit_web_view_set_settings (self->entryview, settings);
 
   GApplication *app = g_application_get_default ();
   AmlApplication *aml = AML_APPLICATION (app);

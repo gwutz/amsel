@@ -1,4 +1,4 @@
-/* amsel-debug.h.in
+/* alb-debug.h
  *
  * Copyright 2018 Günther Wagner <info@gunibert.de>
  *
@@ -22,23 +22,26 @@
 
 G_BEGIN_DECLS
 
-#ifndef AMSEL_ENABLE_TRACING
-#  define AMSEL_ENABLE_TRACING @AMSEL_ENABLE_TRACING@
+#ifndef ALB_ENABLE_TRACING
+#  define ALB_ENABLE_TRACING @ALB_ENABLE_TRACING@
 #endif
-#if AMSEL_ENABLE_TRACING != 1
-#  undef AMSEL_ENABLE_TRACING
-#endif
-
-#ifndef AM_LOG_LEVEL_TRACE
-#define AM_LOG_LEVEL_TRACE ((GLogLevelFlags)(1 << G_LOG_LEVEL_USER_SHIFT))
+#if ALB_ENABLE_TRACING != 1
+#  undef ALB_ENABLE_TRACING
 #endif
 
-#if AMSEL_ENABLE_TRACING
-#define AM_TRACE_MSG(fmt, ...) \
-	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "MSG: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
-#define AM_ENTRY \
-	g_log(G_LOG_DOMAIN, AM_LOG_LEVEL_TRACE, "ENTRY: %s():%d", G_STRFUNC, __LINE__)
+#ifndef ALB_LOG_LEVEL_TRACE
+#define ALB_LOG_LEVEL_TRACE ((GLogLevelFlags)(1 << G_LOG_LEVEL_USER_SHIFT))
+#endif
+
+#if ALB_ENABLE_TRACING
+#define ALB_TRACE_MSG(fmt, ...) \
+	g_log(G_LOG_DOMAIN, ALB_LOG_LEVEL_TRACE, "MSG: %s():%d: " fmt, G_STRFUNC, __LINE__, ##__VA_ARGS__)
+#define ALB_ENTER \
+	g_log(G_LOG_DOMAIN, ALB_LOG_LEVEL_TRACE, "ENTER: %s():%d", G_STRFUNC, __LINE__)
 #else
-#define AM_TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
-#define AM_ENTRY               G_STMT_START { } G_STMT_END
+#define ALB_TRACE_MSG(fmt, ...) G_STMT_START { } G_STMT_END
+#define ALB_ENTER               G_STMT_START { } G_STMT_END
 #endif
+
+G_END_DECLS
+

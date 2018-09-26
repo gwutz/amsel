@@ -1,3 +1,25 @@
+/* alb-parser-rss.c
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "alb-parser-rss"
+
 #include "alb-parser-rss.h"
 #include "alb-parser.h"
 #include "alb-channel.h"
@@ -25,7 +47,7 @@ _channel_title (AlbParser  *parser,
                 xmlDocPtr     doc,
                 xmlNodePtr    cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Channel Title");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_channel_set_title (channel, str);
   xmlFree (str);
@@ -37,7 +59,7 @@ _channel_description (AlbParser  *parser,
                       xmlDocPtr     doc,
                       xmlNodePtr    cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Channel Description");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_channel_set_description (channel, str);
   xmlFree (str);
@@ -49,7 +71,7 @@ _channel_link (AlbParser  *parser,
                xmlDocPtr     doc,
                xmlNodePtr    cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Channel Link");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_channel_set_id (channel, str);
   xmlFree (str);
@@ -61,7 +83,7 @@ _channel_item (AlbParser  *parser,
                xmlDocPtr     doc,
                xmlNodePtr    cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Channel Item");
+  ALB_ENTER;
 
   AlbEntry *item = alb_entry_new ();
   alb_parser_rss_parse_item (parser, item, doc, cur->xmlChildrenNode);
@@ -78,7 +100,7 @@ _channel_image (AlbParser  *parser,
                 xmlDocPtr     doc,
                 xmlNodePtr    cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Channel Image");
+  ALB_ENTER;
 
   cur = cur->xmlChildrenNode;
 
@@ -100,7 +122,7 @@ _item_title (AlbParser *parser,
              xmlDocPtr    doc,
              xmlNodePtr   cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Item Title");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_title (entry, str);
   xmlFree (str);
@@ -112,7 +134,7 @@ _item_description (AlbParser *parser,
                    xmlDocPtr    doc,
                    xmlNodePtr   cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Item Description");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_content (entry, str);
   xmlFree (str);
@@ -124,7 +146,7 @@ _item_guid (AlbParser *parser,
             xmlDocPtr    doc,
             xmlNodePtr   cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Item GUID");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_id (entry, str);
   xmlFree (str);
@@ -136,7 +158,7 @@ _item_pubDate (AlbParser *parser,
                xmlDocPtr    doc,
                xmlNodePtr   cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Item PubDate");
+  ALB_ENTER;
   char *rfc822 = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   g_autoptr (GDateTime) pubDate = alb_date_parser_parse_RFC822 (rfc822);
   alb_entry_set_updated_datetime (entry, pubDate);
@@ -149,7 +171,7 @@ _item_author (AlbParser *parser,
               xmlDocPtr    doc,
               xmlNodePtr   cur)
 {
-  AM_TRACE_MSG ("%s", "Parse Item Author");
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_author (entry, str);
   xmlFree (str);

@@ -3,6 +3,7 @@ aml_sources = [
   'aml-application.c',
   'aml-application-window.c',
   'aml-add-feed-dialog.c',
+  'aml-entry-row.c',
   'downloader/aml-downloader.c',
   aml_resource,
 ]

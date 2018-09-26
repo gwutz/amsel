@@ -1,7 +1,30 @@
+/* alb-parser-atom.c
+ *
+ * Copyright 2018 Günther Wagner <info@gunibert.de>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "alb-parser-atom"
+
 #include "alb-parser-atom.h"
 #include "alb-parser.h"
 #include <libxml/parser.h>
 #include "alb-channel.h"
+#include "alb-debug.h"
 
 struct _AlbParserAtom
 {
@@ -21,6 +44,7 @@ _channel_id (AlbParser  *parser,
              xmlDocPtr     doc,
              xmlNodePtr    cur)
 {
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_channel_set_id (channel, str);
   xmlFree (str);
@@ -32,6 +56,7 @@ _channel_title (AlbParser  *parser,
                 xmlDocPtr     doc,
                 xmlNodePtr    cur)
 {
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_channel_set_title (channel, str);
   xmlFree (str);
@@ -43,6 +68,7 @@ _channel_link (AlbParser  *parser,
                xmlDocPtr     doc,
                xmlNodePtr    cur)
 {
+  ALB_ENTER;
   xmlChar *href = xmlGetProp (cur, BAD_CAST "href");
   if (href) {
     xmlChar *rel = xmlGetProp (cur, BAD_CAST "rel");
@@ -53,12 +79,26 @@ _channel_link (AlbParser  *parser,
   }
 }
 
+
+static void
+_channel_icon (AlbParser  *parser,
+               AlbChannel *channel,
+               xmlDocPtr   doc,
+               xmlNodePtr  cur)
+{
+  ALB_ENTER;
+  char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
+  alb_channel_set_icon (channel, str);
+  xmlFree (str);
+}
+
 static void
 _channel_entry (AlbParser  *parser,
                 AlbChannel *channel,
                 xmlDocPtr     doc,
                 xmlNodePtr    cur)
 {
+  ALB_ENTER;
   AlbEntry *item = alb_entry_new ();
   alb_parser_atom_parse_item (parser, item, doc, cur->xmlChildrenNode);
   alb_channel_add_entry (channel, item);
@@ -70,6 +110,7 @@ _item_title (AlbParser *parser,
              xmlDocPtr    doc,
              xmlNodePtr   cur)
 {
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_title (item, str);
   xmlFree (str);
@@ -81,6 +122,7 @@ _item_content (AlbParser *parser,
                xmlDocPtr    doc,
                xmlNodePtr   cur)
 {
+  ALB_ENTER;
   xmlBufferPtr buffer = xmlBufferCreate ();
   xmlNodeDump (buffer, doc, cur->xmlChildrenNode, 0, 1);
   alb_entry_set_content (item, (char *) buffer->content);
@@ -93,6 +135,7 @@ _item_id (AlbParser *parser,
           xmlDocPtr    doc,
           xmlNodePtr   cur)
 {
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   alb_entry_set_id (item, str);
   xmlFree (str);
@@ -104,6 +147,7 @@ _item_updated (AlbParser *parser,
                xmlDocPtr    doc,
                xmlNodePtr   cur)
 {
+  ALB_ENTER;
   char *str = (char *) xmlNodeListGetString (doc, cur->xmlChildrenNode, 1);
   g_autoptr (GDateTime) updated = g_date_time_new_from_iso8601 (str, NULL);
   alb_entry_set_updated_datetime (item, updated);
@@ -116,6 +160,7 @@ _item_author (AlbParser *parser,
               xmlDocPtr    doc,
               xmlNodePtr   cur)
 {
+  ALB_ENTER;
   cur = cur->xmlChildrenNode;
   while (cur) {
     if (!xmlStrcmp (cur->name, BAD_CAST "name")) {
@@ -159,9 +204,9 @@ alb_parser_atom_parse_channel (AlbParser  *parser,
 
 static GPtrArray *
 alb_parser_atom_internal_parse (AlbParserXml *xmlparser,
-                                  gchar          *url,
-                                  xmlDocPtr       doc,
-                                  xmlNodePtr      node)
+                                gchar        *url,
+                                xmlDocPtr     doc,
+                                xmlNodePtr    node)
 {
   AlbParser *parser = ALB_PARSER (xmlparser);
   GPtrArray *channels = g_ptr_array_new ();
@@ -171,6 +216,12 @@ alb_parser_atom_internal_parse (AlbParserXml *xmlparser,
     {
       AlbChannel *channel = alb_channel_new ();
       alb_parser_atom_parse_channel (parser, channel, doc, cur->xmlChildrenNode);
+
+      // take favicon if no icon was provided
+      if (alb_channel_get_icon (channel) == NULL)
+        {
+
+        }
       g_ptr_array_add (channels, channel);
       cur = cur->next;
     }
@@ -210,6 +261,7 @@ alb_parser_atom_init (AlbParserAtom *self)
   alb_parser_xml_add_channel_handler (xmlparser, "id", _channel_id);
   alb_parser_xml_add_channel_handler (xmlparser, "title", _channel_title);
   alb_parser_xml_add_channel_handler (xmlparser, "link", _channel_link);
+  alb_parser_xml_add_channel_handler (xmlparser, "icon", _channel_icon);
   alb_parser_xml_add_channel_handler (xmlparser, "entry", _channel_entry);
 
   alb_parser_xml_add_item_handler (xmlparser, "title", _item_title);

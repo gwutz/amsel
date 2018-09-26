@@ -18,8 +18,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#define G_LOG_DOMAIN "aml-application"
+
 #include "aml-application.h"
 #include "aml-application-window.h"
+#include "alb-debug.h"
 
 struct _AmlApplication
 {
@@ -42,6 +45,7 @@ aml_application_new (void)
 static void
 aml_application_finalize (GObject *object)
 {
+  ALB_ENTER;
   AmlApplication *self = AML_APPLICATION (object);
 
   g_clear_object (&self->engine);
@@ -76,10 +80,28 @@ aml_application_class_init (AmlApplicationClass *klass)
   app_class->activate = aml_application_activate;
 }
 
+gchar *
+aml_application_get_amsel_data_dir (AmlApplication *self)
+{
+  g_return_val_if_fail (AML_IS_APPLICATION (self), NULL);
+
+  g_autofree gchar *amsel_data_dir;
+
+  amsel_data_dir = g_build_path (G_DIR_SEPARATOR_S, g_get_user_data_dir (), "amsel", NULL);
+  if (g_mkdir_with_parents (amsel_data_dir, 0740) == -1)
+    {
+      return NULL;
+    }
+
+  return g_steal_pointer (&amsel_data_dir);
+}
+
 static void
 aml_application_init (AmlApplication *self)
 {
-  self->engine = alb_engine_new ();
+  g_autofree gchar *data_dir = aml_application_get_amsel_data_dir (self);
+  g_autofree gchar *db_path = g_build_filename (data_dir, "amsel.db", NULL);
+  self->engine = alb_engine_new (db_path);
 }
 
 AlbEngine *
