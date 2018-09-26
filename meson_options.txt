@@ -1,6 +1,2 @@
 option('enable_tracing', type: 'boolean', value: true, description: 'Enable tracing of internals for troubleshooting Amsel')
-# Subproject
-option('package_subdir', type: 'string',
-  description: 'Subdirectory to append to all installed files, for use as subproject'
-)
 option('with_gtk_doc', type: 'boolean', value: false)
