@@ -43,9 +43,6 @@
         {
             "name" : "amsel",
             "buildsystem" : "meson",
-            "config-opts" : [
-                "-Dtracing_enabled=true"
-            ],
             "sources" : [
                 {
                     "type" : "git",

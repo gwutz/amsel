@@ -48,7 +48,7 @@ test_add_channel_error (void)
   GError *error = NULL;
   AlbChannel *channel = alb_channel_new ();
 
-  g_autoptr (AlbDatabase) database = ALB_DATABASE (amsel_memory_database_new ());
+  AlbDatabase* database = ALB_DATABASE (amsel_memory_database_new ());
   AlbCache *cache = alb_cache_new (database);
   alb_cache_add_channel (cache, channel, &error);
   g_object_unref (channel);

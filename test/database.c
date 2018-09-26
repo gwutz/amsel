@@ -10,8 +10,8 @@ test_init_database (void)
 {
   GError *error = NULL;
   AlbChannel *channel = alb_channel_new ();
-  g_autoptr (AmselMemoryDatabase) db = amsel_memory_database_new ();
-  alb_channel_set_source (channel, "custom source 1");
+  AmselMemoryDatabase* db = amsel_memory_database_new ();
+  alb_channel_set_id (channel, "custom source 1");
 
   g_autoptr (AlbCache) cache = alb_cache_new (ALB_DATABASE (db));
   alb_cache_add_channel (cache, channel, &error);
@@ -21,7 +21,7 @@ test_init_database (void)
   g_assert_cmpint (amsel_memory_database_get_counter (db), ==, 1);
 
   channel = alb_channel_new ();
-  alb_channel_set_source (channel, "custom source 2");
+  alb_channel_set_id (channel, "custom source 2");
   amsel_memory_database_set_error (db, TRUE);
   alb_cache_add_channel (cache, channel, &error);
   g_object_unref (channel);
@@ -70,7 +70,7 @@ test_init_database2 (void)
       }
   };
 
-  g_autoptr (AlbSqliteDatabase) db = alb_sqlite_database_new (":memory:");
+  AlbSqliteDatabase* db = alb_sqlite_database_new (":memory:");
   g_autoptr (AlbCache) cache = alb_cache_new (ALB_DATABASE (db));
 
 
@@ -81,7 +81,7 @@ test_init_database2 (void)
     alb_channel_set_title (channel, testdata[i].title);
 
     for (int j = 0; j < sizeof (testentries)/sizeof(*testentries); j++) {
-      g_autoptr (AlbEntry) entry = alb_entry_new ();
+      AlbEntry* entry = alb_entry_new ();
       alb_entry_set_id (entry, testentries[j].id);
       alb_entry_set_title (entry, testentries[j].title);
       alb_entry_set_content (entry, testentries[j].content);

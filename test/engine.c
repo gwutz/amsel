@@ -1,4 +1,5 @@
 #include <glib.h>
+#include <glib/gstdio.h>
 #include "amsel-config.h"
 #include "alb.h"
 #include <libxml/xmlerror.h>
@@ -72,7 +73,8 @@ test_validate_atom (void)
 }
 
 void
-test_parse_rss (void)
+test_parse_rss (gpointer      fixture,
+                gconstpointer user_data)
 {
   GError *error = NULL;
   g_autoptr (AlbEngine) engine;
@@ -131,7 +133,8 @@ test_parse_rss (void)
 }
 
 void
-test_parse_atom (void)
+test_parse_atom (gpointer      fixture,
+                 gconstpointer user_data)
 {
   GError *error = NULL;
   g_autoptr (AlbEngine) engine;
@@ -193,6 +196,26 @@ xml_error_func (void       *ctx,
 {
 }
 
+void
+test_setup (gpointer      fixture,
+            gconstpointer user_data)
+{
+  if (g_file_test ("amsel.db", G_FILE_TEST_EXISTS))
+    {
+      g_remove ("amsel.db");
+    }
+}
+
+void
+test_teardown (gpointer      fixture,
+               gconstpointer user_data)
+{
+  if (g_file_test ("amsel.db", G_FILE_TEST_EXISTS))
+    {
+      g_remove ("amsel.db");
+    }
+}
+
 int
 main (int   argc,
       char *argv[])
@@ -204,8 +227,10 @@ main (int   argc,
 
   /* g_test_add_func ("/validate/rss", test_validate_rss); */
   /* g_test_add_func ("/validate/atom", test_validate_atom); */
-  g_test_add_func ("/parser/rss", test_parse_rss);
-  g_test_add_func ("/parser/atom", test_parse_atom);
+  g_test_add ("/parser/rss", void, NULL, test_setup, test_parse_rss, test_teardown);
+  g_test_add ("/parser/atom", void, NULL, test_setup, test_parse_atom, test_teardown);
+  /* g_test_add_func ("/parser/rss", test_parse_rss); */
+  /* g_test_add_func ("/parser/atom", test_parse_atom); */
 
   return g_test_run ();
 }

@@ -20,9 +20,9 @@ add_project_arguments([
   '-I' + meson.build_root(),
 ], language: 'c')
 
-package_subdir = get_option('package_subdir') # When used as subproject
-girdir = join_paths(get_option('datadir'), package_subdir, 'gir-1.0')
-typelibdir = join_paths(get_option('libdir'), package_subdir, 'girepository-1.0')
+aml_prefix = get_option('prefix')
+girdir = join_paths(aml_prefix, get_option('datadir'), 'gir-1.0')
+typelibdir = join_paths(aml_prefix, get_option('libdir'), 'girepository-1.0')
 
 subdir('data')
 subdir('lib')

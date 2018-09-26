@@ -1,4 +1,5 @@
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <libsoup/soup.h>
 #include "alb.h"
 
@@ -23,6 +24,10 @@ static void
 stresstest_setup (AlbEngineFixture *fixture,
                   gconstpointer       user_data)
 {
+  if (g_file_test ("amsel.db", G_FILE_TEST_EXISTS))
+    {
+      g_remove ("amsel.db");
+    }
   fixture->engine = alb_engine_new ("amsel.db");
 }
 
@@ -57,6 +62,10 @@ stresstest_teardown (AlbEngineFixture *fixture,
                      gconstpointer       user_data)
 {
   g_object_unref (fixture->engine);
+  if (g_file_test ("amsel.db", G_FILE_TEST_EXISTS))
+    {
+      g_remove ("amsel.db");
+    }
 }
 
 int
