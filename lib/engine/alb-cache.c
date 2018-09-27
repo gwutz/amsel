@@ -79,7 +79,7 @@ alb_cache_constructed (GObject *object)
     for (int i = 0; i < channels->len; i++)
       {
         AlbChannel *c = ALB_CHANNEL (g_ptr_array_index (channels, i));
-        const char *key = alb_channel_get_source (c);
+        const char *key = alb_channel_get_id (c);
         g_hash_table_insert (self->channels, (gchar *) key, c);
       }
   }

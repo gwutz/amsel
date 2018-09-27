@@ -224,7 +224,7 @@ aml_application_window_create_row_channel (gpointer item,
 static void
 aml_application_window_new_entry_cb (AlbCache *cache,
                                      AlbEntry *entry,
-                                     gpointer    user_data)
+                                     gpointer  user_data)
 {
   AmlApplicationWindow *self = AML_APPLICATION_WINDOW (user_data);
 
